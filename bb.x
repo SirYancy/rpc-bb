@@ -5,5 +5,4 @@ program BULLETIN_PROG {
         string choose(int id) = 3;
         bool Reply(int id, string user, string Article) = 4;
     } = 1;
-    } 
-        
+} = 0x13131345;
