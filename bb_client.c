@@ -11,6 +11,9 @@
 
 CLIENT *setup_rpc(char *host);
 
+void post(char *user, char *article, CLIENT *clnt);
+void read(CLIENT *clnt);
+
 int main (int argc, char *argv[])
 {
     CLIENT *clnt;
@@ -24,6 +27,9 @@ int main (int argc, char *argv[])
     host = argv[1];
     clnt = setup_rpc(host);
 
+    post("Eric", "Test", clnt);
+
+//    read(clnt);
 
 
 #ifndef	DEBUG
@@ -44,6 +50,18 @@ void post(char *user, char *article, CLIENT *clnt)
 
 }
 
+void read(CLIENT *clnt)
+{
+    char * *result;
+
+	result = read_1(clnt);
+	if (result == (char **) NULL) {
+		clnt_perror (clnt, "call failed");
+	}
+
+    printf("%s\n", *result);
+}
+
 CLIENT *setup_rpc(char *host)
 {
     CLIENT *clnt;
@@ -60,6 +78,7 @@ CLIENT *setup_rpc(char *host)
 
 }
 
+/**
 void
 bulletin_prog_1(char *host)
 {
@@ -70,14 +89,6 @@ bulletin_prog_1(char *host)
 	int reply_1_id;
 	char *reply_1_user;
 	char *reply_1_Article;
-
-#ifndef	DEBUG
-	clnt = clnt_create (host, BULLETIN_PROG, BULLETIN_VERSION, "udp");
-	if (clnt == NULL) {
-		clnt_pcreateerror (host);
-		exit (1);
-	}
-#endif	/* DEBUG */
 
 	result_2 = read_1(clnt);
 	if (result_2 == (char **) NULL) {
@@ -91,9 +102,7 @@ bulletin_prog_1(char *host)
 	if (result_4 == (bool_t *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-#ifndef	DEBUG
 	clnt_destroy (clnt);
-#endif	 /* DEBUG */
 }
 
-
+*/

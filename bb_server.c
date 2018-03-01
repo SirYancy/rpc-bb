@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "backend.h"
 #include "bb.h"
 
 bool_t *

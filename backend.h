@@ -1,5 +1,6 @@
 #ifndef BACKEND
 #define BACKEND
+#include "bb.h"
 
 typedef struct Article
 {
