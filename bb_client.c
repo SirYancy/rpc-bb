@@ -24,12 +24,24 @@ int main (int argc, char *argv[])
     host = argv[1];
     clnt = setup_rpc(host);
 
-	if (argc < 2) {
-		printf ("usage: %s server_host\n", argv[0]);
-		exit (1);
+
+
+#ifndef	DEBUG
+	clnt_destroy (clnt);
+#endif	 /* DEBUG */
+
+    exit (0);
+}
+
+void post(char *user, char *article, CLIENT *clnt)
+{
+	bool_t  *result_1;
+
+	result_1 = post_1(user, article, clnt);
+	if (result_1 == (bool_t *) NULL) {
+		clnt_perror (clnt, "call failed");
 	}
-	host = argv[1];
-exit (0);
+
 }
 
 CLIENT *setup_rpc(char *host)
@@ -51,10 +63,6 @@ CLIENT *setup_rpc(char *host)
 void
 bulletin_prog_1(char *host)
 {
-	CLIENT *clnt;
-	bool_t  *result_1;
-	char *post_1_user;
-	char *post_1_Article;
 	char * *result_2;
 	char * *result_3;
 	int choose_1_id;
@@ -71,10 +79,6 @@ bulletin_prog_1(char *host)
 	}
 #endif	/* DEBUG */
 
-	result_1 = post_1(post_1_user, post_1_Article, clnt);
-	if (result_1 == (bool_t *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
 	result_2 = read_1(clnt);
 	if (result_2 == (char **) NULL) {
 		clnt_perror (clnt, "call failed");

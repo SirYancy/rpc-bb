@@ -12,9 +12,9 @@ SOURCES_SVC.c =
 SOURCES_SVC.h = 
 SOURCES.x = bb.x
 
-TARGETS_SVC.c = bb_svc.c bb_server.c bb_xdr.c 
-TARGETS_CLNT.c = bb_clnt.c bb_client.c bb_xdr.c 
-TARGETS = bb.h bb_xdr.c bb_clnt.c bb_svc.c bb_client.c bb_server.c
+TARGETS_SVC.c = bb_svc.c bb_server.c bb_xdr.c backend.c
+TARGETS_CLNT.c = bb_clnt.c bb_client.c bb_xdr.c backend.c
+TARGETS = bb.h bb_xdr.c bb_clnt.c bb_svc.c bb_client.c bb_server.c backend.h
 
 OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)
 OBJECTS_SVC = $(SOURCES_SVC.c:%.c=%.o) $(TARGETS_SVC.c:%.c=%.o)
@@ -41,6 +41,8 @@ $(CLIENT) : $(OBJECTS_CLNT)
 $(SERVER) : $(OBJECTS_SVC) 
 	$(LINK.c) -o $(SERVER) $(OBJECTS_SVC) $(LDLIBS)
 
- clean:
-	 $(RM) core $(TARGETS) $(OBJECTS_CLNT) $(OBJECTS_SVC) $(CLIENT) $(SERVER)
+# clean:
+# $(RM) core $(TARGETS) $(OBJECTS_CLNT) $(OBJECTS_SVC) $(CLIENT) $(SERVER)
 
+clean:
+	$(RM) core *.o bb_server bb_client
