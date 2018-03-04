@@ -13,17 +13,14 @@ int Article::articleCount = 0;
  * Constructor
  */
 Article::Article(const string a, const string c)
-    :id(++articleCOunt), author(a), contents(c)
+    :id(++articleCount), author(a), contents(c)
 {}
 
 /**
  * Destructor
  */
-~Article::Article()
-{
-    delete author;
-    delete contents;
-}
+Article::~Article()
+{}
 
 /**
  * get the id of the article
@@ -54,7 +51,7 @@ string Article::getContent() const
  */
 string Article::toString() const
 {
-    ostringsream output;
+    ostringstream output;
 
     output << endl
         << id << " - "

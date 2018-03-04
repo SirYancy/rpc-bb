@@ -31,6 +31,7 @@ bool_t post_article(char *user, char *article)
 
 char *get_list()
 {
+    return NULL;
     /**
     buffer[0] = 0;
     Article *curr = articleList;
@@ -51,38 +52,30 @@ char *get_list()
 
 char *get_article(int id)
 {
+    return NULL;
 
 }
 
 bool_t post_reply(int id, char *user, char *article)
 {
+    return 0;
 
 }
 
-/*
 char *get_sub_thread(Article *a)
 {
 
 }
-*/
 
-/*
 void print_article(Article *a)
 {
     cout << a->toString();
 }
-*/
 
 void print_list()
 {
-    /*
-    Article *curr = articleList;
-
-    while (curr != NULL)
+    for(auto const& a : articleMap)
     {
-        print_article(curr);
-        curr = curr->next;
+        print_article(a.second);
     }
-    */
-
 }

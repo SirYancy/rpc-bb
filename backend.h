@@ -1,5 +1,5 @@
-#ifndef BACKEND
-#define BACKEND
+#ifndef BACKEND_H
+#define BACKEND_H
 #include "bb.h"
 #include "Article.h"
 
@@ -8,4 +8,4 @@ char *get_list();
 char *get_article(int id);
 bool_t post_reply(int id, char *user, char *contents);
 
-#endif /* BACKEND */
+#endif /* BACKEND_H */

@@ -27,13 +27,19 @@ int main (int argc, char *argv[])
     host = argv[1];
     clnt = setup_rpc(host);
 
-    
+    char user[] = "Eric";
 
-    post("Eric", "Test1", clnt);
-    post("Eric", "Test2", clnt);
-    post("Eric", "Test3", clnt);
-    post("Eric", "Test4", clnt);
-    post("Eric", "Test5", clnt);
+    char testarticle1[] = "Test1";
+    char testarticle2[] = "Test2";
+    char testarticle3[] = "Test3";
+    char testarticle4[] = "Test4";
+    char testarticle5[] = "Test5";
+
+    post(user, testarticle1, clnt);
+    post(user, testarticle2, clnt);
+    post(user, testarticle3, clnt);
+    post(user, testarticle4, clnt);
+    post(user, testarticle5, clnt);
 
 //    read(clnt);
 
