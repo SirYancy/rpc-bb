@@ -13,6 +13,7 @@ CLIENT *setup_rpc(char *host);
 
 void post(char *user, char *article, CLIENT *clnt);
 void read(CLIENT *clnt);
+void reply(int i, char *user, char *article, CLIENT *clnt);
 
 int main (int argc, char *argv[])
 {
@@ -39,7 +40,10 @@ int main (int argc, char *argv[])
     post(user, testarticle2, clnt);
     post(user, testarticle3, clnt);
     post(user, testarticle4, clnt);
-    post(user, testarticle5, clnt);
+    reply(4, user, testarticle5, clnt);
+
+    printf("GETTING LIST\n");
+    read(clnt);
 
 //    read(clnt);
 
@@ -72,6 +76,15 @@ void read(CLIENT *clnt)
 	}
 
     printf("%s\n", *result);
+}
+
+void reply(int i, char *user, char *article, CLIENT *clnt)
+{
+    bool_t *result;
+	result = reply_1(i, user, article, clnt);
+	if (result == (bool_t *) NULL) {
+		clnt_perror (clnt, "call failed");
+	}
 }
 
 CLIENT *setup_rpc(char *host)
@@ -108,10 +121,6 @@ bulletin_prog_1(char *host)
 	}
 	result_3 = choose_1(choose_1_id, clnt);
 	if (result_3 == (char **) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-	result_4 = reply_1(reply_1_id, reply_1_user, reply_1_Article, clnt);
-	if (result_4 == (bool_t *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
 	clnt_destroy (clnt);

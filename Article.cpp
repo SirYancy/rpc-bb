@@ -46,6 +46,38 @@ string Article::getContent() const
     return contents;
 }
 
+/**
+ * Setter for next article
+ */
+void Article::setNext(Article *a)
+{
+    next = a;
+}
+
+/**
+ * Getterfor next article
+ */
+Article *Article::getNext() const
+{
+    return next;
+}
+
+/**
+ * Setter for reply article
+ */
+void Article::setReply(Article *a)
+{ 
+    reply = a;
+}
+
+/**
+ * Getter for reply article
+ */
+Article *Article::getReply() const
+{
+    return reply;
+}
+
 /** 
  * returns a string representation of the article
  */

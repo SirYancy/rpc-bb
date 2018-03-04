@@ -11,6 +11,9 @@ class Article{
         string author;
         string contents;
 
+        Article *next;
+        Article *reply;
+
     public:
         static int articleCount;
 
@@ -39,10 +42,31 @@ class Article{
          */
         string getContent() const;
 
+        /**
+         * Setter for next article
+         */
+        void setNext(Article *);
+
+        /**
+         * Getterfor next article
+         */
+        Article *getNext() const;
+
+        /**
+         * Setter for reply article
+         */
+        void setReply(Article *);
+
+        /**
+         * Getter for reply article
+         */
+        Article *getReply() const;
+
         /** 
          * returns a string representation of the article
          */
         string toString() const;
+
 };
 
 #endif
