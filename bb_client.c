@@ -27,7 +27,13 @@ int main (int argc, char *argv[])
     host = argv[1];
     clnt = setup_rpc(host);
 
-    post("Eric", "Test", clnt);
+    
+
+    post("Eric", "Test1", clnt);
+    post("Eric", "Test2", clnt);
+    post("Eric", "Test3", clnt);
+    post("Eric", "Test4", clnt);
+    post("Eric", "Test5", clnt);
 
 //    read(clnt);
 
