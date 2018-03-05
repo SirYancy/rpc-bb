@@ -13,7 +13,7 @@ int Article::articleCount = 0;
  * Constructor
  */
 Article::Article(const string a, const string c)
-    :id(++articleCount), author(a), contents(c)
+    :id(++articleCount), author(a), contents(c), next(NULL), reply(NULL)
 {}
 
 /**
@@ -66,7 +66,7 @@ Article *Article::getNext() const
  * Setter for reply article
  */
 void Article::setReply(Article *a)
-{ 
+{
     reply = a;
 }
 
@@ -78,7 +78,7 @@ Article *Article::getReply() const
     return reply;
 }
 
-/** 
+/**
  * returns a string representation of the article
  */
 string Article::toString() const

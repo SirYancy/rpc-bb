@@ -35,12 +35,14 @@ int main (int argc, char *argv[])
     char testarticle3[] = "Test3";
     char testarticle4[] = "Test4";
     char testarticle5[] = "Test5";
+    char testarticle6[] = "Test6";
 
     post(user, testarticle1, clnt);
     post(user, testarticle2, clnt);
     post(user, testarticle3, clnt);
     post(user, testarticle4, clnt);
     reply(4, user, testarticle5, clnt);
+    // reply(5, user, testarticle6, clnt);
 
     printf("GETTING LIST\n");
     read(clnt);

@@ -89,7 +89,7 @@ bool_t post_reply(int id, char *user, char *article)
     articleMap.insert(make_pair(a->getID(), a));
 
     Article *target = articleMap.find(id)->second;
-    
+
     Article *r = target->getReply();
 
     if (r == NULL)

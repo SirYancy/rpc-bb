@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS += -std=c++11 -g -O
-RPCGEN_FLAGS =
+RPCGEN_FLAGS = -N
 
 all: bb_client bb_server
 
