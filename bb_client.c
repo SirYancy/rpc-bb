@@ -42,6 +42,7 @@ int main (int argc, char *argv[])
     post(user, testarticle3, clnt);
     post(user, testarticle4, clnt);
     reply(4, user, testarticle5, clnt);
+    reply(2, user, testarticle6, clnt);
     // reply(5, user, testarticle6, clnt);
 
     printf("GETTING LIST\n");
