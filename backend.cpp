@@ -73,8 +73,16 @@ void get_thread(Article* curr, int depth)
 
 char *get_article(int id)
 {
-    return NULL;
+    Article *target = articleMap.find(id)->second;
+    
+    buffer[0] = 0;
 
+    sprintf(buffer, "%d - %s - %s\n",
+            target->getID(),
+            target->getAuthor().c_str(),
+            target->getContent().c_str());
+
+    return buffer;
 }
 
 /**

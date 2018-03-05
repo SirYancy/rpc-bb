@@ -37,7 +37,7 @@ extern  bool_t * post_1_svc(char *, char *, struct svc_req *);
 #define Read 2
 extern  char ** read_1(CLIENT *);
 extern  char ** read_1_svc(struct svc_req *);
-#define choose 3
+#define Choose 3
 extern  char ** choose_1(int , CLIENT *);
 extern  char ** choose_1_svc(int , struct svc_req *);
 #define Reply 4
@@ -52,7 +52,7 @@ extern  bool_t * post_1_svc();
 #define Read 2
 extern  char ** read_1();
 extern  char ** read_1_svc();
-#define choose 3
+#define Choose 3
 extern  char ** choose_1();
 extern  char ** choose_1_svc();
 #define Reply 4

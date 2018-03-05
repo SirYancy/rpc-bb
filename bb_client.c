@@ -14,6 +14,7 @@ CLIENT *setup_rpc(char *host);
 void post(char *user, char *article, CLIENT *clnt);
 void read(CLIENT *clnt);
 void reply(int i, char *user, char *article, CLIENT *clnt);
+void choose(int i, CLIENT *clnt);
 
 int main (int argc, char *argv[])
 {
@@ -37,19 +38,19 @@ int main (int argc, char *argv[])
     char testarticle5[] = "Test5";
     char testarticle6[] = "Test6";
 
+    printf("POSTING ARTICLES\n");
     post(user, testarticle1, clnt);
     post(user, testarticle2, clnt);
     post(user, testarticle3, clnt);
     post(user, testarticle4, clnt);
     reply(4, user, testarticle5, clnt);
     reply(2, user, testarticle6, clnt);
-    // reply(5, user, testarticle6, clnt);
 
     printf("GETTING LIST\n");
     read(clnt);
 
-//    read(clnt);
-
+    printf("GETTING AN ARTICLE\n");
+    choose(4, clnt);
 
 #ifndef	DEBUG
 	clnt_destroy (clnt);
@@ -90,6 +91,19 @@ void reply(int i, char *user, char *article, CLIENT *clnt)
 	}
 }
 
+void choose(int i, CLIENT *clnt)
+{
+    char * *result;
+
+	result = choose_1(i, clnt);
+	if (result == (char **) NULL) {
+		clnt_perror (clnt, "call failed");
+	}
+
+    printf("%s\n", *result);
+
+}
+
 CLIENT *setup_rpc(char *host)
 {
     CLIENT *clnt;
@@ -105,28 +119,3 @@ CLIENT *setup_rpc(char *host)
     return clnt;
 
 }
-
-/**
-void
-bulletin_prog_1(char *host)
-{
-	char * *result_2;
-	char * *result_3;
-	int choose_1_id;
-	bool_t  *result_4;
-	int reply_1_id;
-	char *reply_1_user;
-	char *reply_1_Article;
-
-	result_2 = read_1(clnt);
-	if (result_2 == (char **) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-	result_3 = choose_1(choose_1_id, clnt);
-	if (result_3 == (char **) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-	clnt_destroy (clnt);
-}
-
-*/
