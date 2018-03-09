@@ -1,3 +1,10 @@
+#include <stdio.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <pthread.h>
+#include <unistd.h>
+
 #include "tcp.h"
 
 bool InitCoordinator(int port) {
@@ -39,8 +46,7 @@ bool InitServer(int port) {
     while( (clientSocket = accept(serverSocket, (struct sockaddr *)&client, (socklen_t*)&c)) )
     {
         pthread_t clientThread;
-        int *newSocket = malloc(1);
-        *newSocket = clientSocket;
+        int *newSocket = &clientSocket;
 
         printf("New client connected\n");
          
@@ -57,6 +63,7 @@ bool InitServer(int port) {
 
 bool InitClient(char *serverIP, int serverPort, int serverSocket) {
     struct sockaddr_in server;
+    int sendSocket;
     char buffer[MAX_LEN];
     int msgLen = 0;
      
@@ -72,7 +79,7 @@ bool InitClient(char *serverIP, int serverPort, int serverSocket) {
     server.sin_port = htons(serverPort);
 
     //Bind
-    if(bind(recvSocket, (struct sockaddr *)&client, sizeof(client)) < 0) {
+    if(bind(sendSocket, (struct sockaddr *)&server, sizeof(server)) < 0) {
         printf("Bind error\n");
         return false;
     }
@@ -106,7 +113,7 @@ void *client_handler(void *pSocket)
     // Free socket pointer
     free(pSocket);
      
-    return;
+    return NULL;
 }
 
 bool SendThroughSocket(int socket, char *buffer, int len) {
