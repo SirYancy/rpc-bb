@@ -1,20 +1,24 @@
-CC = g++
-CFLAGS += -std=c++11 -g -O
-RPCGEN_FLAGS = -N
+CXX = g++
+FLAGS += -std=c++11 -pthread -g -O
 
-all: bb_client bb_server
+all: bb_server
 
-# Objects for Server
+# Objects
 
 Article.o: Article.h Article.cpp
-	$(CC) $(CFLAGS) -c Article.cpp
+	$(CXX) $(FLAGS) -c Article.cpp
+
+tcp.o: tcp.h tcp.c
+	$(CXX) $(FLAGS) -c tcp.c
+
+bb_server.o: bb_server.cpp
+	$(CXX) $(FLAGS) -c bb_server.cpp
 
 # Executables
-bb_client: bb_clnt.o bb_xdr.o bb_client.o
-	$(CC) -o bb_client bb_client.o bb_clnt.o bb_xdr.o -lnsl
 
-bb_server: bb_svc.o backend.o Article.o bb_xdr.o bb_server.o
-	$(CC) -o bb_server Article.o backend.o bb_server.o bb_svc.o bb_xdr.o -lnsl
+bb_server: bb_server.o Article.o tcp.o 
+	$(CXX) $(FLAGS) -c bb_server bb_server.o tcp.o Article.o
+
 
 clean:
 	$(RM) core *.o bb_server bb_client
