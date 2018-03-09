@@ -88,19 +88,12 @@ bool InitClient(char *serverIP, int serverPort, int serverSocket) {
 
 void *client_handler(void *pSocket)
 {
-    int sock = *((int *)pSocket);
+    int socket = *((int *)pSocket);
     int recvSize;
-    char *message , client_message[2000];
+    char *message , buffer[MAX_LEN];
      
-     
-    message = "Now type something and i shall repeat what you type \n";
-    write(sock , message , strlen(message));
-     
-    //
-    while( (recvSize = recv(sock , client_message , 2000 , 0)) > 0 )
-    {
-        //Send the message back to client
-        write(sock , client_message , strlen(client_message));
+    while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
+        // Handle incoming message to respond
     }
      
     if(recvSize == 0) {
