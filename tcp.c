@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
+#include "backend.h"
 #include "tcp.h"
 
 bool InitCoordinator(int port) {
@@ -61,15 +62,15 @@ bool InitServer(int port) {
     return true;
 }
 
-bool InitClient(char *serverIP, int serverPort) {
+bool InitClient(char *serverIP, int serverPort, int &serverSocket)
+{
     struct sockaddr_in server;
-    int sendSocket;
     char buffer[MAX_LEN];
     int msgLen = 0;
      
     // Create socket for connecting to server
-    sendSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if(sendSocket == -1) {
+    serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if(serverSocket == -1) {
         printf("Could not create socket\n");
         return false;
     }
@@ -77,15 +78,9 @@ bool InitClient(char *serverIP, int serverPort) {
     server.sin_addr.s_addr = inet_addr(serverIP);
     server.sin_family = AF_INET;
     server.sin_port = htons(serverPort);
-
-    //Bind
-    if(bind(sendSocket, (struct sockaddr *)&server, sizeof(server)) < 0) {
-        printf("Bind error\n");
-        return false;
-    }
  
     //Connect to server
-    if(connect(sendSocket , (struct sockaddr *)&server , sizeof(server)) < 0) {
+    if(connect(serverSocket, (struct sockaddr *)&server , sizeof(server)) < 0) {
         printf("Connection failed\n");
         return false;
     }
@@ -100,7 +95,7 @@ void *client_handler(void *pSocket)
     char *message , buffer[MAX_LEN];
      
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
-        // Handle incoming message to respond
+        handle_request(buffer);
     }
      
     if(recvSize == 0) {
