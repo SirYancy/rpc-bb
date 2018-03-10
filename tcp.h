@@ -21,7 +21,7 @@ int aClientSocket[MAX_CONNECTION];
 
 bool InitCoordinator(int port);
 bool InitServer(int port);
-bool InitClient(char *serverIP, int serverPort, int serverSocket);
+bool InitClient(char *serverIP, int serverPort);
 
 bool SendThroughSocket(int socket, char *buffer, int len);
 int RecvFromSocket(int socket, char *buffer);

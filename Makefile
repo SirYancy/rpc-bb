@@ -1,5 +1,5 @@
 CXX = g++
-FLAGS += -std=c++11 -pthread -g -O
+FLAGS += -std=c++11 -pthread -Wall -g -o
 
 all: bb_server
 
@@ -16,8 +16,8 @@ bb_server.o: bb_server.cpp
 
 # Executables
 
-bb_server: bb_server.o Article.o tcp.o 
-	$(CXX) $(FLAGS) -c bb_server bb_server.o tcp.o Article.o
+bb_server: Article.o tcp.o bb_server.o 
+	$(CXX) $(FLAGS) -c tcp.o Article.o bb_server.o
 
 
 clean:

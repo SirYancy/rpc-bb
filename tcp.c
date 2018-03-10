@@ -61,7 +61,7 @@ bool InitServer(int port) {
     return true;
 }
 
-bool InitClient(char *serverIP, int serverPort, int serverSocket) {
+bool InitClient(char *serverIP, int serverPort) {
     struct sockaddr_in server;
     int sendSocket;
     char buffer[MAX_LEN];
