@@ -1,7 +1,7 @@
 CXX = g++
 FLAGS += -std=c++11 -pthread -Wall -g
 
-all: bb_server tcp_client
+all: server_tcp client_tcp
 
 # Objects
 
@@ -14,15 +14,17 @@ backend.o: backend.h backend.cpp
 tcp.o: tcp.h tcp.c
 	$(CXX) $(FLAGS) -c tcp.c
 
-bb_server.o: bb_server.cpp
-	$(CXX) $(FLAGS) -c bb_server.cpp
+client_tcp.o: client_tcp.cpp
+	$(CXX) $(FLAGS) -c client_tcp.cpp
+server_tcp.o: server_tcp.cpp
+	$(CXX) $(FLAGS) -c server_tcp.cpp
 
 # Executables
 
-bb_server: Article.o tcp.o backend.o bb_server.o 
-	$(CXX) $(FLAGS) -o server_tcp backend.o tcp.o Article.o bb_server.o
+server_tcp: Article.o tcp.o backend.o server_tcp.o 
+	$(CXX) $(FLAGS) -o server_tcp backend.o tcp.o Article.o server_tcp.o
 
-tcp_client: Article.o client_tcp.o tcp.o backend.o
+client_tcp: Article.o client_tcp.o tcp.o backend.o
 	$(CXX) $(FLAGS) -o client_tcp Article.o backend.o client_tcp.o tcp.o
 
 clean:

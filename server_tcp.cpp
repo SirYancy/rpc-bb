@@ -3,7 +3,7 @@
 int main(int argc, char *argv[]) {
     int port = atoi(argv[1]);
 
-    printf("BB server running on port %d...", port);
+    printf("BB server running on port %d...\n", port);
 
     // Initialize TCP socket
     InitServer(port);

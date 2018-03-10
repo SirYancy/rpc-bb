@@ -21,7 +21,7 @@ bool InitServer(int port) {
     {
         printf("Could not create socket");
     }
-    puts("Socket created");
+    printf("Socket created with port %d\n", port);
      
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
@@ -114,7 +114,7 @@ void *client_handler(void *pSocket)
 bool SendThroughSocket(int socket, char *buffer, int len) {
     int ret = 0;
 
-    ret = send(socket, buffer, sizeof(buffer), 0);
+    ret = send(socket, buffer, len, 0);
     if(len == ret) {
         return true;
     } else if(ret == -1) {

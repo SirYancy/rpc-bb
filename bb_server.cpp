@@ -1,6 +1,5 @@
 #include "tcp.h"
 
-#define PORT 8080
 
 int main()
 {
