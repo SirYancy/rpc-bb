@@ -13,14 +13,9 @@
 void *client_handler(void *);
 void *server_handler(void *);
 
-// Array of sockets for coordinator to store connected server sockets
-int aServerSocket[MAX_CONNECTION];
-
-// Array of sockets for server to store connected client sockets
-int aClientSocket[MAX_CONNECTION];
-
 bool InitCoordinator(int port);
 bool InitServer(int port);
+<<<<<<< HEAD
 bool InitClient(char *serverIP, int serverPort);
 
 bool SendThroughSocket(int socket, char *buffer, int len);
