@@ -95,7 +95,10 @@ void *client_handler(void *pSocket)
     char *message , buffer[MAX_LEN];
      
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
-        handle_request(buffer);
+        message = handle_request(buffer);
+        printf("sending: %s\n", message);
+
+        send(socket, message, strlen(message), 0);
     }
      
     if(recvSize == 0) {

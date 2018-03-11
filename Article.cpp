@@ -12,14 +12,8 @@ int Article::articleCount = 0;
 /**
  * Constructor
  */
-Article::Article(const string a, const string c)
-    :id(++articleCount), author(a), contents(c), next(NULL), reply(NULL)
-{}
-
-/**
- * Destructor
- */
-Article::~Article()
+Article::Article(const string a, const string t, const string c)
+    :id(++articleCount), author(a), title(t), contents(c), next(NULL), reply(NULL)
 {}
 
 /**
@@ -36,6 +30,14 @@ int Article::getID() const
 string Article::getAuthor() const
 {
     return author;
+}
+
+/**
+ * Get the title of the article
+ */
+string Article::getTitle() const
+{
+    return title;
 }
 
 /**
@@ -88,6 +90,7 @@ string Article::toString() const
     output << endl
         << id << " - "
         << author << " - "
+        << title << " - "
         << contents << endl;
 
     return output.str();

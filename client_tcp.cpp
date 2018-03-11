@@ -13,6 +13,8 @@ int main(int argc, char *argv[]) {
         scanf("%s", buffer);
         SendThroughSocket(serverSocket, buffer, strlen(buffer));
 
+        RecvFromSocket(serverSocket, buffer);
+
         printf("%s\n", buffer);
     }
 

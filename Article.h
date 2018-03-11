@@ -9,6 +9,7 @@ class Article{
     private: 
         const int id;
         string author;
+        string title;
         string contents;
 
         Article *next;
@@ -20,12 +21,7 @@ class Article{
         /**
          * Constructor
          */
-        Article(const string, const string);
-
-        /**
-         * Destructor
-         */
-        ~Article();
+        Article(const string, const string, const string);
         
         /**
          * get the id of the article
@@ -36,6 +32,11 @@ class Article{
          * get the author of the article
          */
         string getAuthor() const;
+
+        /**
+         * Get the title of the article
+         */
+        string getTitle() const;
 
         /**
          * get the contents of the article
