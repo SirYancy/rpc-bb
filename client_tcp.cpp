@@ -1,22 +1,113 @@
+#include <string.h>
+#include <pthread.h>
 #include "tcp.h"
 
+int live = 1;
+int serverPort, serverSocket;
+
+void *client_thread_func(void *args);
+
 int main(int argc, char *argv[]) {
-    int serverPort = atoi(argv[2]);
-    int serverSocket = 0;
-    char buffer[MAX_LEN];
+    serverPort = atoi(argv[2]);
+    serverSocket = 0;
+
+    pthread_t client_thread;
 
     // Initialize socket connection
     InitClient(argv[1], serverPort, serverSocket);
 
-    while(true) {
-        // Send something to server
-        scanf("%s", buffer);
-        SendThroughSocket(serverSocket, buffer, strlen(buffer));
+    pthread_create(&client_thread, NULL, client_thread_func, NULL);
 
-        RecvFromSocket(serverSocket, buffer);
+    while(live){}
 
-        printf("%s\n", buffer);
-    }
+    pthread_join(client_thread, NULL);
 
     return 0;
+}
+
+void *client_thread_func(void *args)
+{
+    char buffer[MAX_LEN];
+    int menu_choice;
+
+    char username[20];
+    char title[20];
+    char content[100];
+    int id;
+
+    printf("Who are you? > \n");
+    scanf("%[^\n]s", username);
+
+    while(live)
+    {
+        printf("Welcome, %s!\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
+                username,
+                "What do you want to do?",
+                "1 - Post an article",
+                "2 - List all articles",
+                "3 - Get an article",
+                "4 - Reply to an article",
+                "5 - Exit",
+                "> ");
+        scanf("%d", &menu_choice);
+        //flush input buffer
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF) { }
+        switch(menu_choice)
+        {
+            case 1:
+                printf("\nTitle: ");
+                scanf("%[^\n]s", title);
+                while ((c = getchar()) != '\n' && c != EOF) { }
+                printf("\nContent: ");
+                scanf("%[^\n]s", content);
+                sprintf(buffer, "post;%s;%s;%s",
+                    username,
+                    title,
+                    content);
+                SendThroughSocket(serverSocket, buffer, strlen(buffer));
+                RecvFromSocket(serverSocket, buffer);
+                printf("\n%s\n", buffer);
+                break;
+            case 2:
+                printf("\nRefreshing article list:\n");
+                sprintf(buffer, "list;");
+                SendThroughSocket(serverSocket, buffer, strlen(buffer));
+                RecvFromSocket(serverSocket, buffer);
+                printf("\n%s\n", buffer);
+                break;
+            case 3:
+                printf("\nWhich article: ");
+                scanf("%d", &id);
+                printf("\nGetting article %d\n", id);
+                sprintf(buffer, "article;%d", id);
+                SendThroughSocket(serverSocket, buffer, strlen(buffer));
+                RecvFromSocket(serverSocket, buffer);
+                printf("\n%s\n", buffer);
+                break;
+            case 4:
+                printf("\nReplying to:\n");
+                scanf("%d", &id);
+                while ((c = getchar()) != '\n' && c != EOF) { }
+                printf("\nContent: ");
+                scanf("%[^\n]s", content);
+                while ((c = getchar()) != '\n' && c != EOF) { }
+                sprintf(buffer, "reply;%d;%s;%s",
+                    id,
+                    username,
+                    content);
+                SendThroughSocket(serverSocket, buffer, strlen(buffer));
+                RecvFromSocket(serverSocket, buffer);
+                printf("%s\n", buffer);
+                break;
+            case 5:
+                printf("exiting\n");
+                live = 0;
+                break;
+            default:
+                printf("Invalid input\n");
+                break;
+        }
+    }
+    return NULL;
 }
