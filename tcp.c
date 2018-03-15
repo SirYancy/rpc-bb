@@ -4,14 +4,21 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <unistd.h>
-
+#include <map>
 #include "backend.h"
 #include "tcp.h"
 
+std::map<int, int> gSocketMap;
+
 bool InitCoordinator(int port) {
+    return InitServerWithHandler(port, server_handler);
 }
 
 bool InitServer(int port) {
+    return InitServerWithHandler(port, client_handler);
+}
+
+bool InitServerWithHandler(int port, void *(*handler)(void *)) {
     int serverSocket, clientSocket, c;
     struct sockaddr_in server , client;
      
@@ -51,7 +58,7 @@ bool InitServer(int port) {
 
         printf("New client connected\n");
          
-        if(pthread_create(&clientThread, NULL, client_handler, (void *)newSocket) < 0) {
+        if(pthread_create(&clientThread, NULL, handler, (void *)newSocket) < 0) {
             printf("Cannot create thread\n");
             return false;
         }
@@ -62,11 +69,8 @@ bool InitServer(int port) {
     return true;
 }
 
-bool InitClient(char *serverIP, int serverPort, int &serverSocket)
-{
+bool InitClient(char *serverIP, int serverPort, int &serverSocket) {
     struct sockaddr_in server;
-    char buffer[MAX_LEN];
-    int msgLen = 0;
      
     // Create socket for connecting to server
     serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -88,8 +92,7 @@ bool InitClient(char *serverIP, int serverPort, int &serverSocket)
     return true;
 }
 
-void *client_handler(void *pSocket)
-{
+void *client_handler(void *pSocket) {
     int socket = *((int *)pSocket);
     int recvSize;
     char *message , buffer[MAX_LEN];
@@ -104,7 +107,36 @@ void *client_handler(void *pSocket)
     if(recvSize == 0) {
         printf("Client disconnected\n");
         fflush(stdout);
-    }else if(recvSize == -1) {
+    } else if(recvSize == -1) {
+        printf("Recv error");
+    }
+         
+    // Free socket pointer
+    free(pSocket);
+     
+    return NULL;
+}
+
+void *server_handler(void *pSocket) {
+    int socket = *((int *)pSocket);
+    int recvSize;
+    char *message , buffer[MAX_LEN];
+    
+    // Receive the port number of the client
+    recvSize = recv(socket, buffer, MAX_LEN, 0);
+
+    // Insert the socket mapping for this server
+    gSocketMap.insert(std::pair<int, int>(socket, atoi(buffer)));
+
+    while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
+        // Handle messages from servers
+        send(socket, message, strlen(message), 0);
+    }
+
+    if(recvSize == 0) {
+        printf("Client disconnected\n");
+        fflush(stdout);
+    } else if(recvSize == -1) {
         printf("Recv error");
     }
          

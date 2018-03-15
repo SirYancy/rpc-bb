@@ -15,6 +15,7 @@ void *server_handler(void *);
 
 bool InitCoordinator(int port);
 bool InitServer(int port);
+bool InitServerWithHandler(int port, void *(*handler)(void *));
 bool InitClient(char *serverIP, int serverPort, int &serverSocket);
 
 bool SendThroughSocket(int socket, char *buffer, int len);
