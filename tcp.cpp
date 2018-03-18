@@ -25,7 +25,7 @@ bool InitServerWithHandler(int port, void *(*handler)(void *)) {
     int serverSocket, clientSocket, c;
     struct sockaddr_in server , client;
 
-    //Create socket
+    // Create socket
     serverSocket = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
     if (serverSocket == -1)
     {
@@ -33,31 +33,32 @@ bool InitServerWithHandler(int port, void *(*handler)(void *)) {
     }
     printf("Socket created with port %d\n", port);
 
-    //Prepare the sockaddr_in structure
+    // Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_port = htons(port);
 
-    //Bind
+    // Bind
     if( bind(serverSocket,(struct sockaddr *)&server , sizeof(server)) < 0)
     {
-        //print the error message
+        // print the error message
         perror("bind failed. Error");
         return 1;
     }
     puts("bind done");
 
-    //Listen
+    // Listen
     listen(serverSocket , 3);
 
-    //Accept and incoming connection
+    // Accept and incoming connection
     puts("Waiting for incoming connections...");
     c = sizeof(struct sockaddr_in);
 
     while( (clientSocket = accept(serverSocket, (struct sockaddr *)&client, (socklen_t*)&c)) )
     {
         pthread_t clientThread;
-        int *newSocket = &clientSocket;
+        int *newSocket = malloc(sizeof(int));
+        *newSocket = clientSocket;
 
         printf("New client connected\n");
 
@@ -86,7 +87,7 @@ bool InitClient(char *serverIP, int serverPort, int &serverSocket) {
     server.sin_family = AF_INET;
     server.sin_port = htons(serverPort);
 
-    //Connect to server
+    // Connect to server
     if(connect(serverSocket, (struct sockaddr *)&server , sizeof(server)) < 0) {
         printf("Connection failed\n");
         return false;
