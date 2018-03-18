@@ -7,6 +7,9 @@
 #include <map>
 #include "backend.h"
 #include "tcp.h"
+#include <vector>
+
+using namespace std;
 
 std::map<int, int> gSocketMap;
 
@@ -95,13 +98,41 @@ bool InitClient(char *serverIP, int serverPort, int &serverSocket) {
 void *client_handler(void *pSocket) {
     int socket = *((int *)pSocket);
     int recvSize;
-    char *message , buffer[MAX_LEN];
-     
+    char** message = (char **) malloc (4*sizeof(char*));
+    for (int j = 0; j < 4; j++)
+    {
+	message[j] = (char*) malloc (100*sizeof(char));
+    }
+    char buffer[MAX_LEN];
+         
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
         message = handle_request(buffer);
-        printf("sending: %s\n", message);
-
-        send(socket, message, strlen(message), 0);
+        char *f0 = message[0];
+	char *f1 = message[1];
+	char *f2 = message[2];
+	char *f3 = message[3];
+        bool result;
+	if (strcmp(f0, "post") == 0)
+	{
+	    result = post_article(f1, f2, f3);
+	}
+	else if (strcmp(f0, "reply") == 0)
+	{	
+	    int id = atoi(f1); 
+	    result = post_reply(id, f2, "rep", f3); 
+	}
+	else if (strcmp(f0, "list") == 0)
+	{
+	    char* res = get_list();
+	    printf("list %s\n", res);
+	}
+	else if (strcmp(f0, "article") == 0)
+	{
+	    int id = atoi(f1);
+	    char* res = get_article(id);
+	    printf("article %s\n", res);
+	}
+        send(socket, message[0], strlen(message[0]), 0);
     }
      
     if(recvSize == 0) {

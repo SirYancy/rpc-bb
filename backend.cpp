@@ -1,12 +1,13 @@
 #include <string>
 #include <iostream>
 #include <map>
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "backend.h"
 #include "Article.h" 
 #include "tcp.h"
+#include <vector> 
+
+#define PORT 8080
 
 using namespace std;
 
@@ -20,54 +21,28 @@ void get_thread(Article* a, int depth);
 void print_article(Article *a);
 void print_list();
 
-char *handle_request(char *req)
+char **handle_request(char *req)
 {
-    char *token;
+    char** msg = (char **) malloc (4*sizeof(char*));
+    for (int s = 0; s < 4; s++)
+    {
+        msg[s] = (char*) malloc(100*sizeof(char));
+    }
+    int i = 0;
+    char* token;
     token = strtok(req, ";");
-
-    if (!strcmp(token, "post"))
-    {
-        printf("posting an article\n");
-        char *user = strtok(NULL, ";");
-        char *title = strtok(NULL, ";");
-        char *content = strtok(NULL, ";");
-
-        post_article(user, title, content);
-
-        sprintf(buffer, "done\n");
-        return buffer;
+    while(token != NULL) {
+        printf(" %s\n", token);
+        msg[i] = token;
+        i++;
+        token = strtok(NULL, ";");
     }
-    else if (!strcmp(token, "list"))
-    {
-        printf("Getting List\n");
-        return get_list();
-    }
-    else if (!strcmp(token, "article"))
-    {
-        printf("Getting article\n");
-        int id = atoi(strtok(NULL, ";"));
-        return get_article(id);
-    }
-    else if (!strcmp(token, "reply"))
-    {
-        printf("Replying\n");
-        int id = atoi(strtok(NULL, ";"));
-        char *user = strtok(NULL, ";");
-        char *content = strtok(NULL, ";");
-        post_reply(id, user, content);
-        sprintf(buffer, "done\n");
-        return buffer;
-    }
-    else
-    {
-        printf("Invalid request\n");
-        return NULL;
-    }
-
+    return msg;
 }
 
 bool post_article(char *user, char *title, char *article)
 {
+    printf("posting article\n");
     string u_str(user);
     string t_str(title);
     string a_str(article);
@@ -89,6 +64,7 @@ bool post_article(char *user, char *title, char *article)
 
 char *get_list()
 {
+    printf("get list\n");
     buffer[0] = 0;
 
     // Get a pointer to the first article
@@ -110,7 +86,7 @@ void get_thread(Article* curr, int depth)
         sprintf(buffer + strlen(buffer), "%d - %s - %s - %s\n",
                 curr->getID(),
                 curr->getAuthor().c_str(),
-                curr->getTitle().c_str(),
+		curr->getTitle().c_str(),
                 curr->getContent().c_str());
         if(curr->getReply() != NULL)
         {
@@ -123,32 +99,31 @@ void get_thread(Article* curr, int depth)
 
 char *get_article(int id)
 {
+    printf("get article\n");
     Article *target = articleMap.find(id)->second;
 
     buffer[0] = 0;
 
-    sprintf(buffer, "%d - %s - %s - %s\n",
+    sprintf(buffer, "%d - %s - %s\n",
             target->getID(),
             target->getAuthor().c_str(),
-            target->getTitle().c_str(),
             target->getContent().c_str());
 
     return buffer;
 }
 
 
-bool post_reply(int id, char *user, char *article)
+bool post_reply(int id, char *user, char* title, char *article)
 {
-    //get target article
-    Article *target = articleMap.find(id)->second;
-
-    string t_str = target->getTitle();
-
+    printf("posting reply\n");
     string u_str(user);
+    string t_str(title);
     string a_str(article);
     Article *a = new Article(u_str, t_str, a_str);
 
     articleMap.insert(make_pair(a->getID(), a));
+
+    Article *target = articleMap.find(id)->second;
 
     Article *r = target->getReply();
 
@@ -170,7 +145,7 @@ bool post_reply(int id, char *user, char *article)
             r->setNext(a);
         }
     }
-
+    print_list();
     return 1;
 }
 

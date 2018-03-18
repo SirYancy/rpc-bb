@@ -11,8 +11,8 @@ Article.o: Article.h Article.cpp
 backend.o: backend.h backend.cpp
 	$(CXX) $(FLAGS) -c backend.cpp
 
-tcp.o: tcp.h tcp.c
-	$(CXX) $(FLAGS) -c tcp.c
+tcp.o: tcp.h tcp.cpp
+	$(CXX) $(FLAGS) -c tcp.cpp
 
 client_tcp.o: client_tcp.cpp
 	$(CXX) $(FLAGS) -c client_tcp.cpp
