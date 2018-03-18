@@ -2,7 +2,7 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 
-char** handle_request(char *req);
+char* handle_request(char *req);
 bool post_article(char *user, char *title, char *article);
 char *get_list();
 char *get_article(int id);

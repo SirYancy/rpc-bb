@@ -5,13 +5,14 @@
 #include <string.h>
 #include "Article.h" 
 #include "tcp.h"
+#include "backend.h"
 #include <vector> 
 
 #define PORT 8080
 
 using namespace std;
 
-char buffer[1000];
+char buffer[1024];
 
 map<int, Article*> articleMap;
 
@@ -21,23 +22,44 @@ void get_thread(Article* a, int depth);
 void print_article(Article *a);
 void print_list();
 
-char **handle_request(char *req)
+char *handle_request(char *req)
 {
-    char** msg = (char **) malloc (4*sizeof(char*));
-    for (int s = 0; s < 4; s++)
-    {
-        msg[s] = (char*) malloc(100*sizeof(char));
-    }
-    int i = 0;
+    // Reset the buffer
+    //
+    memset(buffer, '\0', sizeof(char) * strlen(buffer));
     char* token;
     token = strtok(req, ";");
-    while(token != NULL) {
-        printf(" %s\n", token);
-        msg[i] = token;
-        i++;
-        token = strtok(NULL, ";");
+
+    char *tok1 = strtok(NULL, ";");
+    char *tok2 = strtok(NULL, ";");
+    char *tok3 = strtok(NULL, ";");
+
+    char *msg;
+
+    bool result;
+
+    if (strcmp(token, "post") == 0)
+    {
+        result = post_article(tok1, tok2, tok3);
     }
-    return msg;
+    else if (strcmp(token, "reply") == 0)
+    {	
+        int id = atoi(tok1); 
+        result = post_reply(id, tok2, "rep", tok3); 
+    }
+    else if (strcmp(token, "list") == 0)
+    {
+        msg = get_list();
+        printf("list %s\n", msg);
+    }
+    else if (strcmp(token, "article") == 0)
+    {
+        int id = atoi(tok1);
+        msg = get_article(id);
+        printf("article %s\n", msg);
+    }
+
+    return buffer;
 }
 
 bool post_article(char *user, char *title, char *article)
@@ -59,6 +81,8 @@ bool post_article(char *user, char *title, char *article)
 
     print_list();
 
+    sprintf(buffer, "%s", a->toString());
+
     return 1;
 }
 
@@ -71,6 +95,8 @@ char *get_list()
     Article *curr = articleMap.begin()->second;
 
     get_thread(curr, 0);
+
+    printf("\nBuffer:\n%s", buffer);
 
     return buffer;
 }
@@ -86,7 +112,7 @@ void get_thread(Article* curr, int depth)
         sprintf(buffer + strlen(buffer), "%d - %s - %s - %s\n",
                 curr->getID(),
                 curr->getAuthor().c_str(),
-		curr->getTitle().c_str(),
+                curr->getTitle().c_str(),
                 curr->getContent().c_str());
         if(curr->getReply() != NULL)
         {
@@ -119,6 +145,7 @@ bool post_reply(int id, char *user, char* title, char *article)
     string u_str(user);
     string t_str(title);
     string a_str(article);
+    printf("Article: %s\n", article);
     Article *a = new Article(u_str, t_str, a_str);
 
     articleMap.insert(make_pair(a->getID(), a));
@@ -146,6 +173,9 @@ bool post_reply(int id, char *user, char* title, char *article)
         }
     }
     print_list();
+
+    sprintf(buffer, "%s", a->toString());
+
     return 1;
 }
 

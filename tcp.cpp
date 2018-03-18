@@ -24,7 +24,7 @@ bool InitServer(int port) {
 bool InitServerWithHandler(int port, void *(*handler)(void *)) {
     int serverSocket, clientSocket, c;
     struct sockaddr_in server , client;
-     
+
     //Create socket
     serverSocket = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
     if (serverSocket == -1)
@@ -32,12 +32,12 @@ bool InitServerWithHandler(int port, void *(*handler)(void *)) {
         printf("Could not create socket");
     }
     printf("Socket created with port %d\n", port);
-     
+
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_port = htons(port);
-     
+
     //Bind
     if( bind(serverSocket,(struct sockaddr *)&server , sizeof(server)) < 0)
     {
@@ -46,105 +46,78 @@ bool InitServerWithHandler(int port, void *(*handler)(void *)) {
         return 1;
     }
     puts("bind done");
-     
+
     //Listen
     listen(serverSocket , 3);
-     
+
     //Accept and incoming connection
     puts("Waiting for incoming connections...");
     c = sizeof(struct sockaddr_in);
-     
+
     while( (clientSocket = accept(serverSocket, (struct sockaddr *)&client, (socklen_t*)&c)) )
     {
         pthread_t clientThread;
         int *newSocket = &clientSocket;
 
         printf("New client connected\n");
-         
+
         if(pthread_create(&clientThread, NULL, handler, (void *)newSocket) < 0) {
             printf("Cannot create thread\n");
             return false;
         }
-         
+
         pthread_join(clientThread, NULL);
     }
-     
+
     return true;
 }
 
 bool InitClient(char *serverIP, int serverPort, int &serverSocket) {
     struct sockaddr_in server;
-     
+
     // Create socket for connecting to server
     serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(serverSocket == -1) {
         printf("Could not create socket\n");
         return false;
     }
-     
+
     server.sin_addr.s_addr = inet_addr(serverIP);
     server.sin_family = AF_INET;
     server.sin_port = htons(serverPort);
- 
+
     //Connect to server
     if(connect(serverSocket, (struct sockaddr *)&server , sizeof(server)) < 0) {
         printf("Connection failed\n");
         return false;
     }
-    
+
     return true;
 }
 
 void *client_handler(void *pSocket) {
     int socket = *((int *)pSocket);
     int recvSize;
-    char** message = (char **) malloc (4*sizeof(char*));
-    for (int j = 0; j < 4; j++)
-    {
-	message[j] = (char*) malloc (100*sizeof(char));
-    }
     char buffer[MAX_LEN];
-         
+    char *message;
+
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
+        buffer[recvSize] = '\0';
         message = handle_request(buffer);
-        char *f0 = message[0];
-	char *f1 = message[1];
-	char *f2 = message[2];
-	char *f3 = message[3];
-        bool result;
-	if (strcmp(f0, "post") == 0)
-	{
-	    result = post_article(f1, f2, f3);
-	}
-	else if (strcmp(f0, "reply") == 0)
-	{	
-	    int id = atoi(f1); 
-	    result = post_reply(id, f2, "rep", f3); 
-	}
-	else if (strcmp(f0, "list") == 0)
-	{
-	    char* res = get_list();
-	    printf("list %s\n", res);
-	}
-	else if (strcmp(f0, "article") == 0)
-	{
-	    int id = atoi(f1);
-	    char* res = get_article(id);
-	    printf("article %s\n", res);
-	}
-        send(socket, message[0], strlen(message[0]), 0);
+        printf("Message: \n%s\n", message);
+        send(socket, message, strlen(message), 0);
     }
-     
+
     if(recvSize == 0) {
         printf("Client disconnected\n");
         fflush(stdout);
     } else if(recvSize == -1) {
         printf("Recv error");
     }
-         
+
     // Free socket pointer
     free(pSocket);
-     
+
     return NULL;
 }
 
@@ -152,7 +125,7 @@ void *server_handler(void *pSocket) {
     int socket = *((int *)pSocket);
     int recvSize;
     char *message , buffer[MAX_LEN];
-    
+
     // Receive the port number of the client
     recvSize = recv(socket, buffer, MAX_LEN, 0);
 
@@ -170,10 +143,10 @@ void *server_handler(void *pSocket) {
     } else if(recvSize == -1) {
         printf("Recv error");
     }
-         
+
     // Free socket pointer
     free(pSocket);
-     
+
     return NULL;
 }
 
