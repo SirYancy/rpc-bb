@@ -4,7 +4,6 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <unistd.h>
-#include <map>
 #include "backend.h"
 #include "tcp.h"
 #include <vector>
@@ -33,17 +32,23 @@ bool InitServer(int port) {
     return InitServerWithHandler(port, client_handler);
 }
 
+std::map<int, int> GetMap(void) {
+    return gSocketMap;
+}
+
 int RequestIndex(void) {
     char buf[MAX_LEN];
 
     if (gCoordinatorSocket == 0) {
         // Error?
+        printf("Error?\n");
         return -1;
     }
 
     strcpy(buf, "getIndex;");
 
     SendThroughSocket(gCoordinatorSocket, buf, strlen(buf));
+    memset(buf, '\0', MAX_LEN);
     RecvFromSocket(gCoordinatorSocket, buf);
 
     printf("%s, %d", buf, atoi(buf));
@@ -51,8 +56,8 @@ int RequestIndex(void) {
     return atoi(buf);
 }
 
-void SendACK(void) {
-    SendThroughSocket(gCoordinatorSocket, "ACK;", strlen("ACK;"));
+void SendACK(int socket) {
+    SendThroughSocket(socket, "ACK;", strlen("ACK;"));
 
     return;
 }
@@ -138,6 +143,9 @@ bool ConnectToCoordinator(char *serverIP, int serverPort, int localPort) {
 
     // Create socket for connecting to server
     gCoordinatorSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+    printf("Coordinator socket: %d\n", gCoordinatorSocket);
+
     if(gCoordinatorSocket == -1) {
         printf("Could not create socket\n");
         return false;
@@ -155,6 +163,8 @@ bool ConnectToCoordinator(char *serverIP, int serverPort, int localPort) {
 
     // Send local port to coordinator
     sprintf(buf, "%d", localPort);
+    printf("port: %s\n", buf);
+
     SendThroughSocket(gCoordinatorSocket, buf, strlen(buf));
 
     // Prepare socket for receiving messages
@@ -201,7 +211,7 @@ bool ConnectToCoordinator(char *serverIP, int serverPort, int localPort) {
         return false;
     }
 
-    pthread_join(receivingThread, NULL);
+    //pthread_join(receivingThread, NULL);
 
     return true;
 }
@@ -214,9 +224,11 @@ void *client_handler(void *pSocket) {
 
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
         buffer[recvSize] = '\0';
+        printf("tcp Client hdl: %s\n", buffer);
         message = handle_request(buffer, CLIENT);
         printf("Message: \n%s\n", message);
-        send(socket, message, strlen(message), 0);
+        if (message != NULL)
+            send(socket, message, strlen(message), 0);
     }
 
     if(recvSize == 0) {
@@ -255,9 +267,13 @@ void *server_handler(void *pSocket) {
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
         // Handle messages from servers
         buffer[recvSize] = '\0';
+        printf("tcp Server hdl: %s\n", buffer);
         message = handle_request(buffer, SERVER);
         printf("Message: \n%s\n", message);
-        send(socket, message, strlen(message), 0);
+        if (message != NULL) {
+            send(socket, message, strlen(message), 0);
+            printf("SENT back\n");
+        }
     }
 
     if(recvSize == 0) {
@@ -282,6 +298,7 @@ void *receiving_handler(void *pSocket) {
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
         buffer[recvSize] = '\0';
         handle_request(buffer, COORDINATOR);
+        SendACK(socket);
     }
 
     if(recvSize == 0) {

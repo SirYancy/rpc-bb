@@ -3,9 +3,9 @@
 #include "tcp.h"
 
 int live = 1;
-int serverPort, serverSocket;
+int serverPort;
 
-int gCoordinatorSocket = 0;                                                                                                                                                                                         
+int gCoordinatorSocket = 0;
 int gServerSocket = 0;
 int gReceivingSocket = 0;
 
@@ -13,7 +13,6 @@ void *client_thread_func(void *args);
 
 int main(int argc, char *argv[]) {
     serverPort = atoi(argv[2]);
-    serverSocket = 0;
 
     pthread_t client_thread;
 
@@ -69,15 +68,15 @@ void *client_thread_func(void *args)
                     username,
                     title,
                     content);
-                SendThroughSocket(serverSocket, buffer, strlen(buffer));
-                RecvFromSocket(serverSocket, buffer);
-                printf("\n%s\n", buffer);
+                SendThroughSocket(gServerSocket, buffer, strlen(buffer));
+                //RecvFromSocket(gServerSocket, buffer);
+                printf("\n%s SENT\n", buffer);
                 break;
             case 2:
                 printf("\nRefreshing article list:\n");
                 sprintf(buffer, "list;");
-                SendThroughSocket(serverSocket, buffer, strlen(buffer));
-                RecvFromSocket(serverSocket, buffer);
+                SendThroughSocket(gServerSocket, buffer, strlen(buffer));
+                RecvFromSocket(gServerSocket, buffer);
                 printf("\n%s\n", buffer);
                 break;
             case 3:
@@ -85,8 +84,8 @@ void *client_thread_func(void *args)
                 scanf("%d", &id);
                 printf("\nGetting article %d\n", id);
                 sprintf(buffer, "article;%d", id);
-                SendThroughSocket(serverSocket, buffer, strlen(buffer));
-                RecvFromSocket(serverSocket, buffer);
+                SendThroughSocket(gServerSocket, buffer, strlen(buffer));
+                RecvFromSocket(gServerSocket, buffer);
                 printf("\n%s\n", buffer);
                 break;
             case 4:
@@ -100,8 +99,8 @@ void *client_thread_func(void *args)
                     id,
                     username,
                     content);
-                SendThroughSocket(serverSocket, buffer, strlen(buffer));
-                RecvFromSocket(serverSocket, buffer);
+                SendThroughSocket(gServerSocket, buffer, strlen(buffer));
+                RecvFromSocket(gServerSocket, buffer);
                 printf("%s\n", buffer);
                 break;
             case 5:

@@ -45,14 +45,18 @@ char* handle_request(char *command, ROLE role) {
 }
 
 char* serverHandler(char *buffer) {
-    char *command = strtok(buffer, ";");
-
     // Clear buffer
     memset(gBuffer, '\0', MAX_LEN);
+    strcpy(gBuffer, buffer);
+
+    char *command = strtok(buffer, ";");
 
     if (strcmp(command, "getIndex") == 0) {
         // Return article index
         sprintf(gBuffer, "%d", gIndex);
+
+        printf("gIndex: %d\n", gIndex);
+        printf("gBuffer: %s\n", gBuffer);
 
         // Increase index
         gIndex++;
@@ -60,9 +64,32 @@ char* serverHandler(char *buffer) {
         return gBuffer;
     } else if (strcmp(command, "post") == 0) {
         // Sync post with all the other servers
+        std::map<int, int> serverMap = GetMap();
 
+        for (std::map<int, int>::iterator it = serverMap.begin(); it != serverMap.end(); it++) {
+            SendThroughSocket(it->second, gBuffer, strlen(gBuffer));
+            RecvFromSocket(it->second, gBuffer);
+
+            if (strcmp(gBuffer, "ACK;") == 0) {
+                // Go to next one;
+            }
+        }
+
+        return NULL;
     } else if (strcmp(command, "reply") == 0) {
         // Sync reply with all the other servers
+        std::map<int, int> serverMap = GetMap();
+
+        for (std::map<int, int>::iterator it = serverMap.begin(); it != serverMap.end(); it++) {
+            SendThroughSocket(it->second, gBuffer, strlen(gBuffer));
+            RecvFromSocket(it->second, gBuffer);
+
+            if (strcmp(gBuffer, "ACK;") == 0) {
+                // Go to next one;
+            }
+        }
+
+        return NULL;
     } else if (strcmp(command, "list") == 0) {
         // 
     } else if (strcmp(command, "article") == 0) {
@@ -74,7 +101,9 @@ char* clientHandler(char *req)
 {
     // Reset the buffer
     //
-    memset(gBuffer, '\0', sizeof(char) * strlen(gBuffer));
+    memset(gBuffer, '\0', MAX_LEN);
+    printf("clientHandler: %s\n", req);
+    strcpy(gBuffer, req);
     char* token;
     token = strtok(req, ";");
 
@@ -91,9 +120,14 @@ char* clientHandler(char *req)
         // Request index from coordinator first
         int index = RequestIndex();
 
+        printf("Index: %d\n", index);
+
         // Send post request to coordinator
-        sprintf(gBuffer, "%s;%d;", req, index);
+        sprintf(gBuffer, "%s;%d;", gBuffer, index);
+        printf("Client hdl backend:%s\n", gBuffer);
         SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
+
+        return NULL;
     }
     else if (strcmp(token, "reply") == 0)
     {
@@ -103,11 +137,13 @@ char* clientHandler(char *req)
         // Send post request to coordinator
         sprintf(gBuffer, "%s;%d;", req, index);
         SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
+
+        return NULL;
     }
     else if (strcmp(token, "list") == 0)
     {
         msg = get_list();
-        printf("list %s\n", msg);
+        //printf("list %s\n", msg);
     }
     else if (strcmp(token, "article") == 0)
     {
@@ -131,15 +167,15 @@ void receivingHandler(char *buffer) {
         // Error, server should not receive this request
         return;
     } else if (strcmp(command, "post") == 0) {
+        printf("Received post request from coordinator\n");
 
         post_article(tok1, tok2, tok3, atoi(tok4));
-        SendACK();
 
         return;
     } else if (strcmp(command, "reply") == 0) {
+        printf("Received reply request from coordinator\n");
 
         post_reply(atoi(tok1), tok2, "rep", tok3, atoi(tok4));
-        SendACK();
 
         return;
     } else if (strcmp(command, "list") == 0) {
@@ -176,7 +212,7 @@ bool post_article(char *user, char *title, char *article, int index)
 char *get_list()
 {
     printf("get list\n");
-    gBuffer[0] = 0;
+    gBuffer[0] = '\0';
 
     // Get a pointer to the first article
     Article *curr = articleMap.begin()->second;

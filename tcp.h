@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <map>
 
 #define MAX_CONNECTION 10
 #define MAX_LEN 1024
@@ -23,10 +24,10 @@ bool InitServer(int port);
 bool InitServerWithHandler(int port, void *(*handler)(void *));
 
 bool ConnectToServer(char *serverIP, int serverPort);
-bool ConnectToCoordinator(char *serverIP, int serverPort);
+bool ConnectToCoordinator(char *serverIP, int serverPort, int localPort);
 
 int RequestIndex(void);
-void SendACK(void);
+void SendACK(int socket);
 
 bool SendThroughSocket(int socket, char *buffer, int len);
 int RecvFromSocket(int socket, char *buffer);
@@ -35,3 +36,4 @@ int GetCoordinatorSocket(void);
 int GetServerSocket(void);
 int GetReceivingSocket(void);
 
+std::map<int, int> GetMap(void);
