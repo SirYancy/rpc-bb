@@ -21,7 +21,7 @@ class Article{
         /**
          * Constructor
          */
-        Article(const string, const string, const string);
+        Article(const string, const string, const string, int index);
         
         /**
          * get the id of the article

@@ -5,6 +5,10 @@
 int live = 1;
 int serverPort, serverSocket;
 
+int gCoordinatorSocket = 0;                                                                                                                                                                                         
+int gServerSocket = 0;
+int gReceivingSocket = 0;
+
 void *client_thread_func(void *args);
 
 int main(int argc, char *argv[]) {
@@ -14,7 +18,7 @@ int main(int argc, char *argv[]) {
     pthread_t client_thread;
 
     // Initialize socket connection
-    InitClient(argv[1], serverPort, serverSocket);
+    ConnectToServer(argv[1], serverPort);
 
     pthread_create(&client_thread, NULL, client_thread_func, NULL);
 

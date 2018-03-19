@@ -6,14 +6,11 @@
 
 using namespace std;
 
-int Article::articleCount = 0;
-
-
 /**
  * Constructor
  */
-Article::Article(const string a, const string t, const string c)
-    :id(++articleCount), author(a), title(t), contents(c), next(NULL), reply(NULL)
+Article::Article(const string a, const string t, const string c, int index)
+    :id(index), author(a), title(t), contents(c), next(NULL), reply(NULL)
 {}
 
 /**

@@ -1,5 +1,9 @@
 #include "tcp.h"
 
+int gCoordinatorSocket = 0;
+int gServerSocket = 0;
+int gReceivingSocket = 0;
+
 int main(int argc, char *argv[]) {
     int port = atoi(argv[1]);
 
