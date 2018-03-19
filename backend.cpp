@@ -68,12 +68,18 @@ char* serverHandler(char *buffer) {
 
         for (std::map<int, int>::iterator it = serverMap.begin(); it != serverMap.end(); it++) {
             SendThroughSocket(it->second, gBuffer, strlen(gBuffer));
+            memset(gBuffer, '\0', MAX_LEN);
             RecvFromSocket(it->second, gBuffer);
+
+            printf("%d %d %s ", it->first, it->second, gBuffer);
 
             if (strcmp(gBuffer, "ACK;") == 0) {
                 // Go to next one;
+                printf("Received ACK\n");
             }
         }
+
+        printf("\n");
 
         return NULL;
     } else if (strcmp(command, "reply") == 0) {
@@ -82,12 +88,18 @@ char* serverHandler(char *buffer) {
 
         for (std::map<int, int>::iterator it = serverMap.begin(); it != serverMap.end(); it++) {
             SendThroughSocket(it->second, gBuffer, strlen(gBuffer));
+            memset(gBuffer, '\0', MAX_LEN);
             RecvFromSocket(it->second, gBuffer);
+
+            printf("%d ", it->first);
 
             if (strcmp(gBuffer, "ACK;") == 0) {
                 // Go to next one;
+                printf("Received ACK\n");
             }
         }
+
+        printf("\n");
 
         return NULL;
     } else if (strcmp(command, "list") == 0) {
@@ -143,7 +155,7 @@ char* clientHandler(char *req)
     else if (strcmp(token, "list") == 0)
     {
         msg = get_list();
-        //printf("list %s\n", msg);
+        printf("list %s\n", msg);
     }
     else if (strcmp(token, "article") == 0)
     {

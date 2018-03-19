@@ -108,7 +108,7 @@ bool InitServerWithHandler(int port, void *(*handler)(void *)) {
             return false;
         }
 
-        pthread_join(clientThread, NULL);
+        //pthread_join(clientThread, NULL);
     }
 
     return true;
