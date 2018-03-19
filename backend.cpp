@@ -65,15 +65,16 @@ char* serverHandler(char *buffer) {
     } else if (strcmp(command, "post") == 0) {
         // Sync post with all the other servers
         std::map<int, int> serverMap = GetMap();
+        char tmp[MAX_LEN];
 
         for (std::map<int, int>::iterator it = serverMap.begin(); it != serverMap.end(); it++) {
             SendThroughSocket(it->second, gBuffer, strlen(gBuffer));
-            memset(gBuffer, '\0', MAX_LEN);
-            RecvFromSocket(it->second, gBuffer);
+            memset(tmp, '\0', MAX_LEN);
+            RecvFromSocket(it->second, tmp);
 
-            printf("%d %d %s ", it->first, it->second, gBuffer);
+            printf("%d %d %s ", it->first, it->second, tmp);
 
-            if (strcmp(gBuffer, "ACK;") == 0) {
+            if (strcmp(tmp, "ACK;") == 0) {
                 // Go to next one;
                 printf("Received ACK\n");
             }
@@ -85,15 +86,16 @@ char* serverHandler(char *buffer) {
     } else if (strcmp(command, "reply") == 0) {
         // Sync reply with all the other servers
         std::map<int, int> serverMap = GetMap();
+        char tmp[MAX_LEN];
 
         for (std::map<int, int>::iterator it = serverMap.begin(); it != serverMap.end(); it++) {
             SendThroughSocket(it->second, gBuffer, strlen(gBuffer));
-            memset(gBuffer, '\0', MAX_LEN);
-            RecvFromSocket(it->second, gBuffer);
+            memset(tmp, '\0', MAX_LEN);
+            RecvFromSocket(it->second, tmp);
 
             printf("%d ", it->first);
 
-            if (strcmp(gBuffer, "ACK;") == 0) {
+            if (strcmp(tmp, "ACK;") == 0) {
                 // Go to next one;
                 printf("Received ACK\n");
             }
@@ -168,6 +170,7 @@ char* clientHandler(char *req)
 }
 
 void receivingHandler(char *buffer) {
+    printf("receiving hdl: %s\n", buffer);
     char *command = strtok(buffer, ";");
 
     char *tok1 = strtok(NULL, ";");

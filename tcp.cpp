@@ -298,6 +298,7 @@ void *receiving_handler(void *pSocket) {
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
         buffer[recvSize] = '\0';
         handle_request(buffer, COORDINATOR);
+        printf("Send ACK\n");
         SendACK(socket);
     }
 
