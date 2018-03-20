@@ -149,7 +149,7 @@ char* clientHandler(char *req)
         int index = RequestIndex();
 
         // Send post request to coordinator
-        sprintf(gBuffer, "%s;%d;", req, index);
+        sprintf(gBuffer, "%s;%d;", gBuffer, index);
         SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
 
         return NULL;
@@ -265,7 +265,8 @@ char *get_article(int id)
     printf("get article\n");
     Article *target = articleMap.find(id)->second;
 
-    gBuffer[0] = 0;
+    memset(gBuffer, '\0', MAX_LEN);
+    //gBuffer[0] = 0;
 
     sprintf(gBuffer, "%d - %s - %s\n",
             target->getID(),

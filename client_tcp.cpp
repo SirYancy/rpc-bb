@@ -100,7 +100,7 @@ void *client_thread_func(void *args)
                     username,
                     content);
                 SendThroughSocket(gServerSocket, buffer, strlen(buffer));
-                RecvFromSocket(gServerSocket, buffer);
+                //RecvFromSocket(gServerSocket, buffer);
                 printf("%s\n", buffer);
                 break;
             case 5:
