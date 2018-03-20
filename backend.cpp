@@ -25,7 +25,11 @@ char* clientHandlerSeq(char *req);
 char* clientHandlerQuorum(char *req);
 char* clientHandlerRYW(char *req);
 
-char* serverHandler(char *buf);
+char* serverHandler(char *buf, char *type);
+char* serverHandlerSeq(char *buffer);
+char* serverHandlerQuorum(char *buffer);
+char* serverHandlerRYW(char *buffer);
+
 void receivingHandler(char *buf);
 
 void get_thread(Article* a, int depth);
@@ -37,7 +41,7 @@ char* handle_request(char *command, ROLE role, char *type) {
         case CLIENT:
             return clientHandler(command, type);
         case SERVER:
-            return serverHandler(command);
+            return serverHandler(command, type);
         case COORDINATOR:
             // Handle message received from coordinator
             receivingHandler(command);
@@ -48,7 +52,28 @@ char* handle_request(char *command, ROLE role, char *type) {
     }
 }
 
-char* serverHandler(char *buffer) {
+char* serverHandler(char *buffer, char *type) {
+    if (strcmp(type, "seq") == 0)
+    { 
+	return serverHandlerSeq(buffer);
+    }
+    else if (strcmp (type, "quorum") == 0)
+    {
+        return serverHandlerQuorum(buffer);
+    }
+    else if (strcmp (type, "ryw") == 0)
+    { 
+	return serverHandlerRYW(buffer);
+    }
+    else 
+    { 
+        printf("wrong consistency type\n");
+	return NULL;    
+    }
+}
+
+char* serverHandlerSeq(char* buffer)
+{
     // Clear buffer
     memset(gBuffer, '\0', MAX_LEN);
     strcpy(gBuffer, buffer);
@@ -115,6 +140,16 @@ char* serverHandler(char *buffer) {
     }
 }
 
+char* serverHandlerRYW(char *buffer)
+{
+    return NULL;
+}
+
+char* serverHandlerQuorum(char *buffer)
+{
+    return NULL;
+}
+
 char* clientHandler(char *req, char *type)
 { 
     if (strcmp (type, "ryw") == 0 ) {
@@ -127,7 +162,7 @@ char* clientHandler(char *req, char *type)
 	return clientHandlerSeq(req);
     }
     else { 
-	printf("error in consistency type"); 
+	printf("error in consistency type\n"); 
 	return NULL; 
     }
 }
