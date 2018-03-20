@@ -10,6 +10,14 @@
 
 using namespace std;
 
+struct thread_args
+{ 
+    int *pSocket; 
+    char *type;
+};
+
+struct thread_args struct1;
+
 int GetCoordinatorSocket(void) {
     return gCoordinatorSocket;
 }
@@ -24,12 +32,12 @@ int GetReceivingSocket(void) {
 
 std::map<int, int> gSocketMap;
 
-bool InitCoordinator(int port) {
-    return InitServerWithHandler(port, server_handler);
+bool InitCoordinator(int port, char* type) {
+    return InitServerWithHandler(port, server_handler, type);
 }
 
-bool InitServer(int port) {
-    return InitServerWithHandler(port, client_handler);
+bool InitServer(int port, char *type) {
+    return InitServerWithHandler(port, client_handler, type);
 }
 
 std::map<int, int> GetMap(void) {
@@ -62,7 +70,7 @@ void SendACK(int socket) {
     return;
 }
 
-bool InitServerWithHandler(int port, void *(*handler)(void *)) {
+bool InitServerWithHandler(int port, void *(*handler)(void *), char *type) {
     int serverSocket, clientSocket, c;
     struct sockaddr_in server , client;
 
@@ -103,7 +111,10 @@ bool InitServerWithHandler(int port, void *(*handler)(void *)) {
 
         printf("New client connected\n");
 
-        if(pthread_create(&clientThread, NULL, handler, (void *)newSocket) < 0) {
+	struct1.pSocket = newSocket;
+	struct1.type = type;
+
+        if(pthread_create(&clientThread, NULL, handler, (void *)&struct1) < 0) {
             printf("Cannot create thread\n");
             return false;
         }
@@ -216,16 +227,18 @@ bool ConnectToCoordinator(char *serverIP, int serverPort, int localPort) {
     return true;
 }
 
-void *client_handler(void *pSocket) {
-    int socket = *((int *)pSocket);
+void *client_handler(void *ptr) {
+    struct thread_args *args = (struct thread_args *)ptr;
+    int socket = *((int *)(args->pSocket));
     int recvSize;
     char buffer[MAX_LEN];
     char *message;
+    char *consType = (char *)args->type;
 
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
         buffer[recvSize] = '\0';
         printf("tcp Client hdl: %s\n", buffer);
-        message = handle_request(buffer, CLIENT);
+        message = handle_request(buffer, CLIENT, consType);
         printf("Message: \n%s\n", message);
         if (message != NULL)
             send(socket, message, strlen(message), 0);
@@ -239,16 +252,18 @@ void *client_handler(void *pSocket) {
     }
 
     // Free socket pointer
-    free(pSocket);
+    free(args->pSocket);
 
     return NULL;
 }
 
-void *server_handler(void *pSocket) {
-    int socket = *((int *)pSocket);
+void *server_handler(void *ptr) {
+    struct thread_args *args = (struct thread_args *) ptr;
+    int socket = *((int *)(args->pSocket));
     int sendSocket = 0;
     int recvSize;
     char *message , buffer[MAX_LEN];
+    char *consType = (char *) args->type;
 
     // Receive the port number of the client
     recvSize = recv(socket, buffer, MAX_LEN, 0);
@@ -268,7 +283,7 @@ void *server_handler(void *pSocket) {
         // Handle messages from servers
         buffer[recvSize] = '\0';
         printf("tcp Server hdl: %s\n", buffer);
-        message = handle_request(buffer, SERVER);
+        message = handle_request(buffer, SERVER, consType);
         printf("Message: \n%s\n", message);
         if (message != NULL) {
             send(socket, message, strlen(message), 0);
@@ -284,7 +299,7 @@ void *server_handler(void *pSocket) {
     }
 
     // Free socket pointer
-    free(pSocket);
+    free(args->pSocket);
 
     return NULL;
 }
@@ -297,7 +312,7 @@ void *receiving_handler(void *pSocket) {
 
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
         buffer[recvSize] = '\0';
-        handle_request(buffer, COORDINATOR);
+        handle_request(buffer, COORDINATOR, "");
         printf("Send ACK\n");
         SendACK(socket);
     }
@@ -322,7 +337,7 @@ bool SendThroughSocket(int socket, char *buffer, int len) {
     if(len == ret) {
         return true;
     } else if(ret == -1) {
-        printf("Send error\n");
+	printf("Send error\n");
         return false;
     } else {
         // Size is not the same?

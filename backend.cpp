@@ -20,7 +20,11 @@ Article *last;
 
 int gIndex = 0;
 
-char* clientHandler(char *buf);
+char* clientHandler(char *buf, char* type);
+char* clientHandlerSeq(char *req);
+char* clientHandlerQuorum(char *req);
+char* clientHandlerRYW(char *req);
+
 char* serverHandler(char *buf);
 void receivingHandler(char *buf);
 
@@ -28,10 +32,10 @@ void get_thread(Article* a, int depth);
 void print_article(Article *a);
 void print_list();
 
-char* handle_request(char *command, ROLE role) {
+char* handle_request(char *command, ROLE role, char *type) {
     switch (role) {
         case CLIENT:
-            return clientHandler(command);
+            return clientHandler(command, type);
         case SERVER:
             return serverHandler(command);
         case COORDINATOR:
@@ -111,7 +115,24 @@ char* serverHandler(char *buffer) {
     }
 }
 
-char* clientHandler(char *req)
+char* clientHandler(char *req, char *type)
+{ 
+    if (strcmp (type, "ryw") == 0 ) {
+	return clientHandlerRYW(req);
+    }
+    else if (strcmp (type, "quorum") == 0) { 
+        return clientHandlerQuorum(req);
+    }
+    else if (strcmp (type, "seq") == 0) { 
+	return clientHandlerSeq(req);
+    }
+    else { 
+	printf("error in consistency type"); 
+	return NULL; 
+    }
+}
+
+char* clientHandlerSeq(char *req)
 {
     // Reset the buffer
     //
@@ -169,6 +190,14 @@ char* clientHandler(char *req)
     return msg;
 }
 
+char *clientHandlerRYW(char *req)
+{
+	return NULL;
+}
+
+char *clientHandlerQuorum(char *req){ 
+	return NULL;
+}
 void receivingHandler(char *buffer) {
     printf("receiving hdl: %s\n", buffer);
     char *command = strtok(buffer, ";");

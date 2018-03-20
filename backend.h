@@ -3,7 +3,7 @@
 #define BACKEND_H
 enum ROLE {CLIENT, SERVER, COORDINATOR};
 
-char* handle_request(char *req, ROLE role);
+char* handle_request(char *req, ROLE role, char *type);
 bool post_article(char *user, char *title, char *article, int index);
 char *get_list();
 char *get_article(int id);
