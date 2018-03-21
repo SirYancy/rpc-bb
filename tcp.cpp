@@ -141,7 +141,7 @@ bool ConnectToServer(char *serverIP, int serverPort) {
 
     // Connect to server
     if(connect(gServerSocket, (struct sockaddr *)&server , sizeof(server)) < 0) {
-        printf("Connection failed\n");
+        printf("Connection failed %s\n", strerror(errno));
         return false;
     }
 
@@ -168,7 +168,7 @@ bool ConnectToCoordinator(char *serverIP, int serverPort, int localPort) {
 
     // Connect to coordinator
     if(connect(gCoordinatorSocket, (struct sockaddr *)&server , sizeof(server)) < 0) {
-        printf("Connection failed\n");
+        printf("Connection failed %s\n", strerror(errno));
         return false;
     }
 

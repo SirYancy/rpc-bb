@@ -172,7 +172,8 @@ char* serverHandlerRYW(char *buffer)
 	return gBuffer;
     } 
   */  
-    return NULL;
+    // TODO: edit it such that it only sends to other servers, not all servers 
+    serverHandlerSeq(buffer);
 }
 
 char* serverHandlerQuorum(char *buffer)
@@ -235,7 +236,7 @@ char* clientHandlerSeq(char *req)
         int index = RequestIndex();
 
         // Send post request to coordinator
-        sprintf(gBuffer, "%s;%d;", req, index);
+        sprintf(gBuffer, "%s;%d;", gBuffer, index);
         SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
 
         return NULL;
@@ -257,7 +258,7 @@ char* clientHandlerSeq(char *req)
 
 char *clientHandlerRYW(char *req)
 {
-    /*// Reset the buffer
+    // Reset the buffer
     //
     memset(gBuffer, '\0', MAX_LEN);
     printf("clientHandler: %s\n", req);
@@ -268,6 +269,7 @@ char *clientHandlerRYW(char *req)
     char *tok1 = strtok(NULL, ";");
     char *tok2 = strtok(NULL, ";");
     char *tok3 = strtok(NULL, ";");
+    char *tok4 = strtok(NULL, ";");
 
     char *msg;
 
@@ -276,20 +278,40 @@ char *clientHandlerRYW(char *req)
     if (strcmp(token, "post") == 0)
     {
         // Request index from coordinator first
+        // coord_flag = 1;
         int index = RequestIndex();
 
         printf("Index: %d\n", index);
-
-        // Request primary copy from the coordinator
-        sprintf(gBuffer, "getCopy;%s;%d;", gBuffer, index);
+        //update your local copy of the article map	
+        post_article(tok1, tok2, tok3, atoi(tok4));
+     
+        //tell coordinator to propagate updates to everyone else 
+        sprintf(gBuffer, "%s;%d;", gBuffer, index);
         printf("ClientRYW hdl backend:%s\n", gBuffer);
         SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
 
         return NULL;
     }
-
-*/
-	return NULL;
+    else if (strcmp(token, "reply") == 0)
+    { 
+	int index = RequestIndex(); 
+	post_reply(atoi(tok1), tok2, "rep", tok3, atoi(tok4));
+        sprintf(gBuffer, "%s;%d;", gBuffer, index);
+	printf("ClientRYW Reply: %s\n", gBuffer);
+	SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
+    }
+    else if (strcmp(token, "list") == 0)
+    {
+	msg = get_list();
+        printf("list %s\n", msg);
+    }
+    else if (strcmp(token, "article") == 0)
+    {
+        int id = atoi(tok1);
+        msg = get_article(id);
+        printf("article %s\n", msg);
+    }
+    return msg;
 }
 
 char *clientHandlerQuorum(char *req){ 

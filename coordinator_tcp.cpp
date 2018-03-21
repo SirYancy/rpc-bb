@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     printf("Coordinator running on port %d...\n", port);
 
     // Initialize TCP socket
+//    InitCoordinator(port, consistencyType);
     InitCoordinator(port, consistencyType);
-
     return 0;
 }
