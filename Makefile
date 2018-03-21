@@ -9,7 +9,7 @@ Article.o: Article.h Article.cpp
 	$(CXX) $(FLAGS) -c Article.cpp
 
 backend.o: backend.h backend.cpp
-	$(CXX) $(FLAGS) -c backend.cpp -lboost_system
+	$(CXX) $(FLAGS) -c backend.cpp
 
 tcp.o: tcp.h tcp.cpp
 	$(CXX) $(FLAGS) -c tcp.cpp

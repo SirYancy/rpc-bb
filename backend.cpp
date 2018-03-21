@@ -7,9 +7,6 @@
 #include "tcp.h"
 #include "backend.h"
 #include <vector> 
-#include <boost/serialization/map.hpp> 
-#include <boost/archive/text_oarchive.hpp> 
-#include <boost/asio.hpp> 
 
 #define PORT 8080
 
@@ -145,7 +142,7 @@ char* serverHandlerSeq(char* buffer)
 
 char* serverHandlerRYW(char *buffer)
 {
-    //handler by the coordinator to handle requests from servers 
+/*    //handler by the coordinator to handle requests from servers 
     // Clear buffer
     memset(gBuffer, '\0', MAX_LEN);
     strcpy(gBuffer, buffer);
@@ -174,7 +171,7 @@ char* serverHandlerRYW(char *buffer)
 	sprintf(gBuffer, "%s", cstr);
 	return gBuffer;
     } 
-    
+  */  
     return NULL;
 }
 
@@ -260,7 +257,7 @@ char* clientHandlerSeq(char *req)
 
 char *clientHandlerRYW(char *req)
 {
-    // Reset the buffer
+    /*// Reset the buffer
     //
     memset(gBuffer, '\0', MAX_LEN);
     printf("clientHandler: %s\n", req);
@@ -291,7 +288,7 @@ char *clientHandlerRYW(char *req)
         return NULL;
     }
 
-
+*/
 	return NULL;
 }
 
