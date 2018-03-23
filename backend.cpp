@@ -20,22 +20,6 @@ Article *last;
 
 int gIndex = 0;
 
-char* clientHandler(char *buf, char* type);
-char* clientHandlerSeq(char *req);
-char* clientHandlerQuorum(char *req);
-char* clientHandlerRYW(char *req);
-
-char* serverHandler(char *buf, char *type);
-char* serverHandlerSeq(char *buffer);
-char* serverHandlerQuorum(char *buffer);
-char* serverHandlerRYW(char *buffer);
-
-void receivingHandler(char *buf);
-
-void get_thread(Article* a, int depth);
-void print_article(Article *a);
-void print_list();
-
 char* handle_request(char *command, ROLE role, char *type) {
     switch (role) {
         case CLIENT:
@@ -175,9 +159,53 @@ char* serverHandlerRYW(char *buffer)
     return NULL;
 }
 
-char* serverHandlerQuorum(char *buffer)
+har* serverHandlerQuorum(char *buffer)
 {
-    return NULL;
+    // Clear buffer
+    memset(gBuffer, '\0', MAX_LEN);
+    strcpy(gBuffer, buffer);
+
+    char *command = strtok(buffer, ";");
+
+    if (strcmp(command, "getIndex") == 0) {
+        // Return article index
+        sprintf(gBuffer, "%d", gIndex);
+
+        printf("gIndex: %d\n", gIndex);
+        printf("gBuffer: %s\n", gBuffer);
+
+        // Increase index
+        gIndex++;
+
+        return gBuffer;
+    } else if (strcmp(command, "post") == 0) {
+        int n = serverMap.size();
+        int m = (n + 2 - 1) / 2;
+
+        vector<int> keys = getQuroum(m);
+
+
+        // Sync post with all the other servers
+        char tmp[MAX_LEN];
+
+        for (auto const& i: indices)
+            int s = serverMap.find(i);
+
+            SendThroughSocket(s, gBuffer, strlen(gBuffer));
+            memset(tmp, '\0', MAX_LEN);
+            RecvFromSocket(s, tmp);
+
+            printf("%d %d %s ", i, s, tmp);
+
+            if (strcmp(tmp, "ACK;") == 0) {
+                // Go to next one;
+                printf("Received ACK\n");
+            }
+        }
+
+        printf("\n");
+
+        return NULL;
 }
 
 char* clientHandler(char *req, char *type)
@@ -293,7 +321,32 @@ char *clientHandlerRYW(char *req)
 }
 
 char *clientHandlerQuorum(char *req){ 
-	return NULL;
+    // Reset the buffer
+    //
+    memset(gBuffer, '\0', MAX_LEN);
+    printf("clientHandler: %s\n", req);
+    strcpy(gBuffer, req);
+    char* token;
+    token = strtok(req, ";");
+    
+    char *msg;
+
+    bool result;
+
+    if (strcmp(token, "post") == 0)
+    {
+        // Request index from coordinator first
+        int index = RequestIndex();
+
+        printf("Index: %d\n", index);
+
+        // Send post request to coordinator
+        sprintf(gBuffer, "%s;%d;", gBuffer, index);
+        printf("Client hdl backend:%s\n", gBuffer);
+        SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
+
+        return NULL;
+    }
 }
 void receivingHandler(char *buffer) {
     printf("receiving hdl: %s\n", buffer);
@@ -457,3 +510,27 @@ void print_list()
     }
 }
 
+vector<int> getQuorum(int num)
+{
+    // Select n random servers to sync
+    std::map<int, int> serverMap = GetMap();
+
+    std::vector<int> indices;
+    for (int i = 0; i < serverMap.size(); i++) indices.push_back(i);
+
+    std::random_shuffle( indices.begin(), indices.end() );
+    indices.resize(num);
+
+    std::vector<int> keys;
+
+    for (auto const& i: indices)
+    {
+        iterator item = serverMap.begin();
+        std::advance(item, i);
+
+        keys.push_back(it->first);
+    }
+
+
+    return keys;
+}
