@@ -1,3 +1,4 @@
+#include <iostream>
 #include "tcp.h"
 
 int gCoordinatorSocket = 0;
@@ -5,6 +6,13 @@ int gServerSocket = 0;
 int gReceivingSocket = 0;
 
 int main(int argc, char *argv[]) {
+
+    if(argc != 6){
+        std::cout << "syntax is ./server_tcp PORT COORD_IP COORD_PORT RECV_PORT CONSISTENCY TYPE (seq, quorum, rwy)" << std::endl;
+        return 1;
+    }
+
+
     int port = atoi(argv[1]);
     char *coordinatorIP = argv[2];
     int coordinatorPort = atoi(argv[3]);

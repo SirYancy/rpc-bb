@@ -1,0 +1,92 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ARTICLE_H	Article.h	2;"	d
+Article	Article.cpp	/^Article::Article(const string a, const string t, const string c, int index)$/;"	f	class:Article
+Article	Article.h	/^class Article{$/;"	c
+BACKEND_H	backend.h	4;"	d
+CLIENT	backend.h	/^enum ROLE {CLIENT, SERVER, COORDINATOR};$/;"	e	enum:ROLE
+COORDINATOR	backend.h	/^enum ROLE {CLIENT, SERVER, COORDINATOR};$/;"	e	enum:ROLE
+ConnectToCoordinator	tcp.cpp	/^bool ConnectToCoordinator(char *serverIP, int serverPort, int localPort) {$/;"	f
+ConnectToServer	tcp.cpp	/^bool ConnectToServer(char *serverIP, int serverPort) {$/;"	f
+GetCoordinatorSocket	tcp.cpp	/^int GetCoordinatorSocket(void) {$/;"	f
+GetMap	tcp.cpp	/^std::map<int, int> GetMap(void) {$/;"	f
+GetReceivingSocket	tcp.cpp	/^int GetReceivingSocket(void) {$/;"	f
+GetServerSocket	tcp.cpp	/^int GetServerSocket(void) {$/;"	f
+InitCoordinator	tcp.cpp	/^bool InitCoordinator(int port, char* type) {$/;"	f
+InitServer	tcp.cpp	/^bool InitServer(int port, char *type) {$/;"	f
+InitServerWithHandler	tcp.cpp	/^bool InitServerWithHandler(int port, void *(*handler)(void *), char *type) {$/;"	f
+MAX_CONNECTION	tcp.h	11;"	d
+MAX_LEN	tcp.h	12;"	d
+PORT	backend.cpp	12;"	d	file:
+ROLE	backend.h	/^enum ROLE {CLIENT, SERVER, COORDINATOR};$/;"	g
+RecvFromSocket	tcp.cpp	/^int RecvFromSocket(int socket, char *buffer) {$/;"	f
+RequestIndex	tcp.cpp	/^int RequestIndex(void) {$/;"	f
+SERVER	backend.h	/^enum ROLE {CLIENT, SERVER, COORDINATOR};$/;"	e	enum:ROLE
+SendACK	tcp.cpp	/^void SendACK(int socket) {$/;"	f
+SendThroughSocket	tcp.cpp	/^bool SendThroughSocket(int socket, char *buffer, int len) {$/;"	f
+articleCount	Article.h	/^        static int articleCount;$/;"	m	class:Article
+articleMap	backend.cpp	/^map<int, Article*> articleMap;$/;"	v
+author	Article.h	/^        string author;$/;"	m	class:Article
+clientHandler	backend.cpp	/^char* clientHandler(char *req, char *type)$/;"	f
+clientHandlerQuorum	backend.cpp	/^char *clientHandlerQuorum(char *req){ $/;"	f
+clientHandlerRYW	backend.cpp	/^char *clientHandlerRYW(char *req)$/;"	f
+clientHandlerSeq	backend.cpp	/^char* clientHandlerSeq(char *req)$/;"	f
+client_handler	tcp.cpp	/^void *client_handler(void *ptr) {$/;"	f
+client_thread_func	client_tcp.cpp	/^void *client_thread_func(void *args)$/;"	f
+contents	Article.h	/^        string contents;$/;"	m	class:Article
+gBuffer	backend.cpp	/^char gBuffer[MAX_LEN];$/;"	v
+gCoordinatorSocket	client_tcp.cpp	/^int gCoordinatorSocket = 0;$/;"	v
+gCoordinatorSocket	coordinator_tcp.cpp	/^int gCoordinatorSocket = 0;$/;"	v
+gCoordinatorSocket	server_tcp.cpp	/^int gCoordinatorSocket = 0;$/;"	v
+gIndex	backend.cpp	/^int gIndex = 0;$/;"	v
+gReceivingSocket	client_tcp.cpp	/^int gReceivingSocket = 0;$/;"	v
+gReceivingSocket	coordinator_tcp.cpp	/^int gReceivingSocket = 0;$/;"	v
+gReceivingSocket	server_tcp.cpp	/^int gReceivingSocket = 0;$/;"	v
+gServerSocket	client_tcp.cpp	/^int gServerSocket = 0;$/;"	v
+gServerSocket	coordinator_tcp.cpp	/^int gServerSocket = 0;$/;"	v
+gServerSocket	server_tcp.cpp	/^int gServerSocket = 0;$/;"	v
+gSocketMap	tcp.cpp	/^std::map<int, int> gSocketMap;$/;"	v
+getAuthor	Article.cpp	/^string Article::getAuthor() const$/;"	f	class:Article
+getContent	Article.cpp	/^string Article::getContent() const$/;"	f	class:Article
+getID	Article.cpp	/^int Article::getID() const$/;"	f	class:Article
+getNext	Article.cpp	/^Article *Article::getNext() const$/;"	f	class:Article
+getQuorum	backend.cpp	/^vector<int> getQuorum(int num)$/;"	f
+getReply	Article.cpp	/^Article *Article::getReply() const$/;"	f	class:Article
+getTitle	Article.cpp	/^string Article::getTitle() const$/;"	f	class:Article
+get_article	backend.cpp	/^char *get_article(int id)$/;"	f
+get_list	backend.cpp	/^char *get_list()$/;"	f
+get_thread	backend.cpp	/^void get_thread(Article* curr, int depth)$/;"	f
+handle_request	backend.cpp	/^char* handle_request(char *command, ROLE role, char *type) {$/;"	f
+id	Article.h	/^        const int id;$/;"	m	class:Article
+last	backend.cpp	/^Article *last;$/;"	v
+live	client_tcp.cpp	/^int live = 1;$/;"	v
+main	bb_server.cpp	/^int main()$/;"	f
+main	client_tcp.cpp	/^int main(int argc, char *argv[]) {$/;"	f
+main	coordinator_tcp.cpp	/^int main(int argc, char *argv[]) {$/;"	f
+main	server_tcp.cpp	/^int main(int argc, char *argv[]) {$/;"	f
+next	Article.h	/^        Article *next;$/;"	m	class:Article
+pSocket	tcp.cpp	/^    int *pSocket; $/;"	m	struct:thread_args	file:
+post_article	backend.cpp	/^bool post_article(char *user, char *title, char *article, int index)$/;"	f
+post_reply	backend.cpp	/^bool post_reply(int id, char *user, char* title, char *article, int index)$/;"	f
+print_article	backend.cpp	/^void print_article(Article *a)$/;"	f
+print_list	backend.cpp	/^void print_list()$/;"	f
+receivingHandler	backend.cpp	/^void receivingHandler(char *buffer) {$/;"	f
+receiving_handler	tcp.cpp	/^void *receiving_handler(void *pSocket) {$/;"	f
+reply	Article.h	/^        Article *reply;$/;"	m	class:Article
+serverHandler	backend.cpp	/^char* serverHandler(char *buffer, char *type) {$/;"	f
+serverHandlerQuorum	backend.cpp	/^char* serverHandlerQuorum(char *buffer)$/;"	f
+serverHandlerRYW	backend.cpp	/^char* serverHandlerRYW(char *buffer)$/;"	f
+serverHandlerSeq	backend.cpp	/^char* serverHandlerSeq(char* buffer)$/;"	f
+serverPort	client_tcp.cpp	/^int serverPort;$/;"	v
+server_handler	tcp.cpp	/^void *server_handler(void *ptr) {$/;"	f
+setNext	Article.cpp	/^void Article::setNext(Article *a)$/;"	f	class:Article
+setReply	Article.cpp	/^void Article::setReply(Article *a)$/;"	f	class:Article
+struct1	tcp.cpp	/^struct thread_args struct1;$/;"	v	typeref:struct:thread_args
+thread_args	tcp.cpp	/^struct thread_args$/;"	s	file:
+title	Article.h	/^        string title;$/;"	m	class:Article
+toString	Article.cpp	/^string Article::toString() const$/;"	f	class:Article
+type	tcp.cpp	/^    char *type;$/;"	m	struct:thread_args	file:

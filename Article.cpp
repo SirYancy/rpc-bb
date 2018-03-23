@@ -92,3 +92,29 @@ string Article::toString() const
 
     return output.str();
 }
+
+/**
+ * Formatted string for syncing servers
+ */
+string Article::getSyncString() const
+{
+    ostringstream output;
+
+    output 
+        << id << ";"
+        << author << ";"
+        << title << ";"
+        << contents;
+
+    if(next != NULL)
+        output << next->getID() << ";";
+    else
+        output << ";";
+
+    if(reply != NULL)
+        output << reply->getID() << ";";
+    else
+        output << ";";
+
+    return output.str();
+}

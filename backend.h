@@ -1,3 +1,4 @@
+#include "Article.h"
 #include <vector>
 #ifndef BACKEND_H
 #define BACKEND_H
@@ -15,9 +16,13 @@ char* serverHandlerRYW(char *buffer);
 
 void receivingHandler(char *buf);
 
+void syncServer(int socket);
+
 void get_thread(Article* a, int depth);
 void print_article(Article *a);
 void print_list();
+
+vector<int> getQuorum(int num);
 
 char* handle_request(char *req, ROLE role, char *type);
 bool post_article(char *user, char *title, char *article, int index);

@@ -1,4 +1,5 @@
 #include <string>
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <stdio.h>
@@ -18,7 +19,7 @@ map<int, Article*> articleMap;
 
 Article *last;
 
-int gIndex = 0;
+int gIndex = 1;
 
 char* handle_request(char *command, ROLE role, char *type) {
     switch (role) {
@@ -159,11 +160,14 @@ char* serverHandlerRYW(char *buffer)
     return NULL;
 }
 
-har* serverHandlerQuorum(char *buffer)
+char* serverHandlerQuorum(char *buffer)
 {
     // Clear buffer
     memset(gBuffer, '\0', MAX_LEN);
     strcpy(gBuffer, buffer);
+
+    // Get the server map
+    std::map<int, int> serverMap = GetMap();
 
     char *command = strtok(buffer, ";");
 
@@ -182,14 +186,16 @@ har* serverHandlerQuorum(char *buffer)
         int n = serverMap.size();
         int m = (n + 2 - 1) / 2;
 
-        vector<int> keys = getQuroum(m);
-
+        vector<int> keys = getQuorum(m);
 
         // Sync post with all the other servers
         char tmp[MAX_LEN];
 
-        for (auto const& i: indices)
+        for (auto const& i: keys)
+        {
             int s = serverMap.find(i);
+
+            syncServer(s);
 
             SendThroughSocket(s, gBuffer, strlen(gBuffer));
             memset(tmp, '\0', MAX_LEN);
@@ -206,6 +212,8 @@ har* serverHandlerQuorum(char *buffer)
         printf("\n");
 
         return NULL;
+    }
+    return NULL;
 }
 
 char* clientHandler(char *req, char *type)
@@ -347,6 +355,7 @@ char *clientHandlerQuorum(char *req){
 
         return NULL;
     }
+    return NULL;
 }
 void receivingHandler(char *buffer) {
     printf("receiving hdl: %s\n", buffer);
@@ -358,7 +367,11 @@ void receivingHandler(char *buffer) {
     char *tok4 = strtok(NULL, ";");
 
     if (strcmp(command, "getIndex") == 0) {
-        // Error, server should not receive this request
+        // Coordinator wants this server's current index/version
+        printf("Received index request from server: %d\n", gIndex);
+        memset(gBuffer, '\0', MAX_LEN);
+        sprintf(gBuffer, "index;%d", index);
+        SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
         return;
     } else if (strcmp(command, "post") == 0) {
         printf("Received post request from coordinator\n");
@@ -512,7 +525,7 @@ void print_list()
 
 vector<int> getQuorum(int num)
 {
-    // Select n random servers to sync
+    // Select num random servers
     std::map<int, int> serverMap = GetMap();
 
     std::vector<int> indices;
@@ -525,12 +538,30 @@ vector<int> getQuorum(int num)
 
     for (auto const& i: indices)
     {
-        iterator item = serverMap.begin();
+        std::map<int,int>::iterator item = serverMap.begin();
         std::advance(item, i);
 
-        keys.push_back(it->first);
+        keys.push_back(item->first);
     }
 
 
     return keys;
+}
+
+void syncServer(int socket)
+{
+    char *getIndex = "getIndex;";
+    char cIndex = [10];
+    memset(gBuffer, '\0',);
+    SendThroughSocket(socket, getIndex, strlen(getIndex));
+    RecvFromSocket(socket, cIndex);
+
+    int index = atoi(strtok(cIndex, ";"));
+    if(index < gIndex)
+    {
+        
+
+    }
+    
+    return;
 }

@@ -10,6 +10,7 @@ int main(int argc, char *argv[]) {
 
     if(argc != 3 )
     {
+        std::cout << "You supplied " << argc << "args" << endl;
         std::cout << "Syntax is: ./coordinator_tcp PORT TYPE (seq, quorum, rwy)" << endl;
         return 1;
     }
