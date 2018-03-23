@@ -19,9 +19,9 @@ void *client_handler(void *);
 void *server_handler(void *);
 void *receiving_handler(void *);
 
-bool InitCoordinator(int port);
-bool InitServer(int port);
-bool InitServerWithHandler(int port, void *(*handler)(void *));
+bool InitCoordinator(int port, char* type);
+bool InitServer(int port, char* type);
+bool InitServerWithHandler(int port, void *(*handler)(void *), char *type);
 
 bool ConnectToServer(char *serverIP, int serverPort);
 bool ConnectToCoordinator(char *serverIP, int serverPort, int localPort);

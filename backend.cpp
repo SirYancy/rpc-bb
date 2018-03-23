@@ -20,20 +20,28 @@ Article *last;
 
 int gIndex = 0;
 
-char* clientHandler(char *buf);
-char* serverHandler(char *buf);
+char* clientHandler(char *buf, char* type);
+char* clientHandlerSeq(char *req);
+char* clientHandlerQuorum(char *req);
+char* clientHandlerRYW(char *req);
+
+char* serverHandler(char *buf, char *type);
+char* serverHandlerSeq(char *buffer);
+char* serverHandlerQuorum(char *buffer);
+char* serverHandlerRYW(char *buffer);
+
 void receivingHandler(char *buf);
 
 void get_thread(Article* a, int depth);
 void print_article(Article *a);
 void print_list();
 
-char* handle_request(char *command, ROLE role) {
+char* handle_request(char *command, ROLE role, char *type) {
     switch (role) {
         case CLIENT:
-            return clientHandler(command);
+            return clientHandler(command, type);
         case SERVER:
-            return serverHandler(command);
+            return serverHandler(command, type);
         case COORDINATOR:
             // Handle message received from coordinator
             receivingHandler(command);
@@ -44,7 +52,28 @@ char* handle_request(char *command, ROLE role) {
     }
 }
 
-char* serverHandler(char *buffer) {
+char* serverHandler(char *buffer, char *type) {
+    if (strcmp(type, "seq") == 0)
+    { 
+	return serverHandlerSeq(buffer);
+    }
+    else if (strcmp (type, "quorum") == 0)
+    {
+        return serverHandlerQuorum(buffer);
+    }
+    else if (strcmp (type, "ryw") == 0)
+    { 
+	return serverHandlerRYW(buffer);
+    }
+    else 
+    { 
+        printf("wrong consistency type\n");
+	return NULL;    
+    }
+}
+
+char* serverHandlerSeq(char* buffer)
+{
     // Clear buffer
     memset(gBuffer, '\0', MAX_LEN);
     strcpy(gBuffer, buffer);
@@ -111,7 +140,64 @@ char* serverHandler(char *buffer) {
     }
 }
 
-char* clientHandler(char *req)
+char* serverHandlerRYW(char *buffer)
+{
+/*    //handler by the coordinator to handle requests from servers 
+    // Clear buffer
+    memset(gBuffer, '\0', MAX_LEN);
+    strcpy(gBuffer, buffer);
+
+    char *command = strtok(buffer, ";");
+
+    if (strcmp(command, "getIndex") == 0) {
+        // Return article index
+        sprintf(gBuffer, "%d", gIndex);
+
+        printf("gIndex: %d\n", gIndex);
+        printf("gBuffer: %s\n", gBuffer);
+
+        // Increase index
+        gIndex++;
+
+        return gBuffer;
+    } else if (strcmp(command, "getCopy") == 0) {
+        std::map<int, int> serverMap = GetMap(); 
+	std::ostringstream s;
+	boost::archive::text_oarchive arch(s);
+	arch << serverMap;
+	string out_map = s.str();
+	char *cstr = new char[out_map.length() + 1];
+	strcpy(cstr, out_map.c_str());
+	sprintf(gBuffer, "%s", cstr);
+	return gBuffer;
+    } 
+  */  
+    return NULL;
+}
+
+char* serverHandlerQuorum(char *buffer)
+{
+    return NULL;
+}
+
+char* clientHandler(char *req, char *type)
+{ 
+    if (strcmp (type, "ryw") == 0 ) {
+	return clientHandlerRYW(req);
+    }
+    else if (strcmp (type, "quorum") == 0) { 
+        return clientHandlerQuorum(req);
+    }
+    else if (strcmp (type, "seq") == 0) { 
+	return clientHandlerSeq(req);
+    }
+    else { 
+	printf("error in consistency type\n"); 
+	return NULL; 
+    }
+}
+
+char* clientHandlerSeq(char *req)
 {
     // Reset the buffer
     //
@@ -169,6 +255,46 @@ char* clientHandler(char *req)
     return msg;
 }
 
+char *clientHandlerRYW(char *req)
+{
+    /*// Reset the buffer
+    //
+    memset(gBuffer, '\0', MAX_LEN);
+    printf("clientHandler: %s\n", req);
+    strcpy(gBuffer, req);
+    char* token;
+    token = strtok(req, ";");
+
+    char *tok1 = strtok(NULL, ";");
+    char *tok2 = strtok(NULL, ";");
+    char *tok3 = strtok(NULL, ";");
+
+    char *msg;
+
+    bool result;
+
+    if (strcmp(token, "post") == 0)
+    {
+        // Request index from coordinator first
+        int index = RequestIndex();
+
+        printf("Index: %d\n", index);
+
+        // Request primary copy from the coordinator
+        sprintf(gBuffer, "getCopy;%s;%d;", gBuffer, index);
+        printf("ClientRYW hdl backend:%s\n", gBuffer);
+        SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
+
+        return NULL;
+    }
+
+*/
+	return NULL;
+}
+
+char *clientHandlerQuorum(char *req){ 
+	return NULL;
+}
 void receivingHandler(char *buffer) {
     printf("receiving hdl: %s\n", buffer);
     char *command = strtok(buffer, ";");
