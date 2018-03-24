@@ -34,4 +34,4 @@ coordinator_tcp: Article.o coordinator_tcp.o tcp.o backend.o
 	$(CXX) $(FLAGS) -o coordinator_tcp Article.o backend.o coordinator_tcp.o tcp.o
 
 clean:
-	$(RM) core *.o server_tcp client_tcp
+	$(RM) core *.o server_tcp client_tcp coordinator_tcp

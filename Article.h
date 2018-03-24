@@ -68,6 +68,10 @@ class Article{
          */
         string toString() const;
 
+        /**
+         * Formatted string for syncing servers
+         */
+        string getSyncString() const;
 };
 
 #endif

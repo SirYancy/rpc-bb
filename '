@@ -552,7 +552,7 @@ void syncServer(int socket)
 {
     char *getIndex = "getIndex;";
     char cIndex[10];
-    memset(gBuffer, '\0', strlen(cIndex));
+    memset(gBuffer, '\0', strlen(cIndex);
     SendThroughSocket(socket, getIndex, strlen(getIndex));
     RecvFromSocket(socket, cIndex);
 
@@ -563,5 +563,5 @@ void syncServer(int socket)
 
     }
     
-    return;
+    return 1;
 }
