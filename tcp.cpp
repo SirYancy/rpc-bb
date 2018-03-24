@@ -279,7 +279,7 @@ void *server_handler(void *ptr) {
     // Insert the socket mapping for this server
     gSocketMap.insert(std::pair<int, int>(socket, gServerSocket));
 
-    while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
+    while((recvSize = recv(socket, buffer, MAX_LEN,0)) > 0) {
         // Handle messages from servers
         buffer[recvSize] = '\0';
         printf("tcp Server hdl: %s\n", buffer);

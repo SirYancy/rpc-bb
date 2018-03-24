@@ -283,7 +283,7 @@ char *clientHandlerRYW(char *req)
 
         printf("Index: %d\n", index);
         //update your local copy of the article map	
-        post_article(tok1, tok2, tok3, atoi(tok4));
+        post_article(tok1, tok2, tok3, index);
      
         //tell coordinator to propagate updates to everyone else 
         sprintf(gBuffer, "%s;%d;", gBuffer, index);
@@ -354,6 +354,11 @@ bool post_article(char *user, char *title, char *article, int index)
     string u_str(user);
     string t_str(title);
     string a_str(article);
+    if (articleMap.find(index) != articleMap.end())
+    {
+        printf("Already posted this article\n");
+	return 1;
+    }
     Article *a = new Article(u_str, t_str, a_str, index);
 
     // Keep a reference to the most recent root article.
