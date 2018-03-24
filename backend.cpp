@@ -29,7 +29,7 @@ char* handle_request(char *command, ROLE role, char *type) {
             return serverHandler(command, type);
         case COORDINATOR:
             // Handle message received from coordinator
-            receivingHandler(command);
+            return receivingHandler(command);
             break;
         default:
             printf("Invalid role type\n");
@@ -176,6 +176,7 @@ char* serverHandlerQuorum(char *buffer)
     char *tok4 = strtok(NULL, ";");
 
     if (strcmp(command, "getIndex") == 0) {
+        printf("Server requested new index\n");
         // Return article index
         sprintf(gBuffer, "%d", gIndex);
 
@@ -185,31 +186,48 @@ char* serverHandlerQuorum(char *buffer)
         // Increase index
         gIndex++;
 
+        printf("New gIndex: %d\n", gIndex);
+
         return gBuffer;
     } else if (strcmp(command, "post") == 0) {
+        char tmp[MAX_LEN];
+        memset(tmp, '\0', MAX_LEN);
+
         printf("POSTING\n");
         int n = serverMap.size();
         int m = (n + 2 - 1) / 2;
 
-        post_article(tok1, tok2, tok3, atoi(tok4));
+        // post_article(tok1, tok2, tok3, atoi(tok4));
 
         vector<int> keys = getQuorum(m);
+        // Most recent index
+        int leadSocket = getLead(&keys);
+        printf("Lead Socket: %d\n", leadSocket);
 
-        // Sync post with all the other servers
-        char tmp[MAX_LEN];
+        // Post the article at lead server first
+        SendThroughSocket(leadSocket, gBuffer, strlen(gBuffer));
+        RecvFromSocket(leadSocket, tmp);
+        if (strcmp(tmp, "ACK;") == 0) {
+            // Go to next one;
+            printf("Received ACK\n");
+        }
 
+        // Sync post with all the other servers in quorum
         for (auto const& i: keys)
         {
-            map<int,int>::iterator it = serverMap.find(i);
+            if(i != leadSocket)
+            {
+                map<int,int>::iterator it = serverMap.find(i);
 
-            syncServer(it->second);
+                syncServer(leadSocket, it->second);
+            }
         }
 
         printf("\n");
 
-        return gBuffer;
+        return NULL;
     }
-    return gBuffer;
+    return NULL;
 }
 
 char* clientHandler(char *req, char *type)
@@ -339,6 +357,7 @@ char *clientHandlerQuorum(char *req){
 
     if (strcmp(token, "post") == 0)
     {
+        printf("Requestiong Index from Coordinator\n");
         // Request index from coordinator first
         int index = RequestIndex();
 
@@ -354,7 +373,7 @@ char *clientHandlerQuorum(char *req){
     return NULL;
 }
 
-void receivingHandler(char *buffer) {
+char *receivingHandler(char *buffer) {
     printf("receiving hdl: %s\n", buffer);
     char *command = strtok(buffer, ";");
 
@@ -369,25 +388,21 @@ void receivingHandler(char *buffer) {
         printf("Received index request from Coordinator: %d\n", gIndex);
         memset(gBuffer, '\0', MAX_LEN);
         sprintf(gBuffer, "index;%d", gIndex);
-        SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
-        printf("Sent Index\n");
-        return;
+        return gBuffer;
     } else if (strcmp(command, "post") == 0) {
         printf("Received post request from coordinator\n");
 
         post_article(tok1, tok2, tok3, atoi(tok4));
 
-        return;
     } else if (strcmp(command, "reply") == 0) {
         printf("Received reply request from coordinator\n");
 
         post_reply(atoi(tok1), tok2, "rep", tok3, atoi(tok4));
 
-        return;
     } else if (strcmp(command, "list") == 0) {
-        // 
+        // TODO
     } else if (strcmp(command, "article") == 0) {
-        //
+        // TODO
     } else if (strcmp(command, "sync") == 0) {
         int targetID = atoi(tok5);
 
@@ -399,7 +414,16 @@ void receivingHandler(char *buffer) {
         {
             post_reply(targetID, tok1, tok2, tok3, atoi(tok4));
         }
+    } else if (strcmp(command, "syncarticle") == 0) {
+        int i = atoi(tok1);
+        Article*a = articleMap.find(i)->second;
+
+        memset(gBuffer, '\0', MAX_LEN);
+        sprintf(gBuffer, "%s", a->getSyncString().c_str());
+        return gBuffer;
     }
+
+    return NULL;
 }
 
 bool post_article(char *user, char *title, char *article, int index)
@@ -558,30 +582,90 @@ vector<int> getQuorum(int num)
     return keys;
 }
 
-void syncServer(int socket)
+char *queryIndex = "queryIndex;";
+char *syncCommand = "sync;";
+char cIndex[10];
+
+/**
+ * Returns socket of lead server
+ */
+int getLead(vector<int> *keys)
 {
-    printf("Syncing Quroum\n");
-    char *getIndex = "queryIndex;";
-    char *syncCommand = "sync;";
-    char cIndex[10];
-    memset(gBuffer, '\0', strlen(cIndex));
+    printf("Getting Most Updated Quorum Member\n");
+    printf("Current Index: %d\n", gIndex);
 
-    SendThroughSocket(socket, getIndex, strlen(getIndex));
-    RecvFromSocket(socket, cIndex);
-    printf("cIndex: %s\n", cIndex);
+    std::map<int, int> serverMap = GetMap();
 
-    int index = atoi(strtok(cIndex, ";"));
-    if(index < gIndex)
+    int leadSocket = -1;
+    int index = -1;
+
+    for(auto const& i: *keys)
     {
-        index++;
-        for(index; index <= gIndex; index++)
+        map<int,int>::iterator it = serverMap.find(i);
+
+        memset(cIndex, '\0', 10);
+        SendThroughSocket(it->second, queryIndex, strlen(queryIndex));
+        RecvFromSocket(it->second, cIndex);
+        int nIndex = atoi(strtok(cIndex, ";"));
+        printf("Test Index: %d\n", nIndex);
+
+        if (nIndex > index)
         {
-            memset(gBuffer, '\0', strlen(cIndex));
-            Article *a = articleMap.find(index)->second;
+            index = nIndex;
+            leadSocket = it->second;
+        }
+    }
+    
+    return leadSocket;
+}
+
+
+void syncServer(int leadSocket, int syncSocket)
+{
+    printf("Syncing Server\n");
+    char tmp[MAX_LEN];
+    memset(gBuffer, '\0', MAX_LEN);
+
+    SendThroughSocket(syncSocket, queryIndex, strlen(queryIndex));
+    RecvFromSocket(syncSocket, cIndex);
+
+    int syncIndex = atoi(strtok(cIndex, ";"));
+    printf("Received syncIndex: %d\n", syncIndex);
+
+    SendThroughSocket(leadSocket, queryIndex, strlen(queryIndex));
+    RecvFromSocket(leadSocket, cIndex);
+
+    int leadIndex = atoi(strtok(cIndex, ";"));
+
+    printf("Received leadIndex: %d\n", leadIndex);
+
+    if(syncIndex < leadIndex)
+    {
+        // increment by one to get next article
+        syncIndex++;
+        for(syncIndex; syncIndex < leadIndex; syncIndex++)
+        {
+            memset(gBuffer, '\0', MAX_LEN);
+            memset(tmp, '\0', MAX_LEN);
+
+            // Get the next article
+            sprintf(gBuffer, "syncarticle;%d", syncIndex);
+            SendThroughSocket(leadSocket, gBuffer, strlen(gBuffer));
+            int recvlen = RecvFromSocket(leadSocket, gBuffer);
+            gBuffer[recvlen] = '\0';
+
+            printf("Article to sync: %s\n", gBuffer);
             sprintf(gBuffer, "%s%s",
                     syncCommand,
-                    a->getSyncString());
-            SendThroughSocket(socket, getIndex, strlen(getIndex));
+                    gBuffer);
+
+            // Send it to the sync target
+            SendThroughSocket(syncSocket, gBuffer, strlen(gBuffer));
+            RecvFromSocket(syncSocket, tmp);
+            if (strcmp(tmp, "ACK;") == 0) {
+                // Go to next one;
+                printf("Received ACK\n");
+            }
         }
     }
     

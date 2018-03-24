@@ -14,15 +14,15 @@ char* serverHandlerSeq(char *buffer);
 char* serverHandlerQuorum(char *buffer);
 char* serverHandlerRYW(char *buffer);
 
-void receivingHandler(char *buf);
-
-void syncServer(int socket);
+char* receivingHandler(char *buf);
 
 void get_thread(Article* a, int depth);
 void print_article(Article *a);
 void print_list();
 
 vector<int> getQuorum(int num);
+int getLead(vector<int> *keys);
+void syncServer(int leadSocket, int syncSocket);
 
 char* handle_request(char *req, ROLE role, char *type);
 bool post_article(char *user, char *title, char *article, int index);
