@@ -365,6 +365,7 @@ void receivingHandler(char *buffer) {
     char *tok2 = strtok(NULL, ";");
     char *tok3 = strtok(NULL, ";");
     char *tok4 = strtok(NULL, ";");
+    char *tok5 = strtok(NULL, ";");
 
     if (strcmp(command, "getIndex") == 0) {
         // Coordinator wants this server's current index/version
@@ -389,6 +390,21 @@ void receivingHandler(char *buffer) {
         // 
     } else if (strcmp(command, "article") == 0) {
         //
+    } else if (strcmp(command, "sync") == 0) {
+        int targetID = atoi(tok5);
+
+        if(targetID == 0)
+        {
+            post_article(tok1, tok2, tok3, atoi(tok4));
+        }
+        else
+        {
+            post_reply(targetID, tok1, tok2, tok3, atoi(tok4));
+        }
+
+
+
+        
     }
 }
 
@@ -398,7 +414,9 @@ bool post_article(char *user, char *title, char *article, int index)
     string u_str(user);
     string t_str(title);
     string a_str(article);
+
     Article *a = new Article(u_str, t_str, a_str, index);
+    a->setParentID(0);
 
     // Keep a reference to the most recent root article.
     if (last != NULL)
@@ -411,7 +429,7 @@ bool post_article(char *user, char *title, char *article, int index)
 
     print_list();
 
-    //sprintf(buffer, "%s", a->toString());
+    gIndex = index;
 
     return 1;
 }
@@ -481,6 +499,7 @@ bool post_reply(int id, char *user, char* title, char *article, int index)
     articleMap.insert(make_pair(a->getID(), a));
 
     Article *target = articleMap.find(id)->second;
+    a->setParentID(target->getID());
 
     Article *r = target->getReply();
 
@@ -490,22 +509,19 @@ bool post_reply(int id, char *user, char* title, char *article, int index)
     }
     else
     {
-        if(r->getNext() == NULL)
-            r->setNext(a);
-        else
+        if(r->getNext() != NULL)
         {
             r = r->getNext();
             while(r->getNext() != NULL)
             {
                 r = r->getNext();
             }
-            r->setNext(a);
         }
+        r->setNext(a);
     }
     print_list();
 
-    // TBD, remove for compiling
-    //sprintf(gBuffer, "%s", a->toString());
+    gIndex = index;
 
     return 1;
 }
@@ -551,6 +567,7 @@ vector<int> getQuorum(int num)
 void syncServer(int socket)
 {
     char *getIndex = "getIndex;";
+    char *syncCommand = "sync;";
     char cIndex[10];
     memset(gBuffer, '\0', strlen(cIndex));
     SendThroughSocket(socket, getIndex, strlen(getIndex));
@@ -559,8 +576,16 @@ void syncServer(int socket)
     int index = atoi(strtok(cIndex, ";"));
     if(index < gIndex)
     {
-        
-
+        index++;
+        for(index; index <= gIndex; index++)
+        {
+            memset(gBuffer, '\0', strlen(cIndex));
+            Article *a = articleMap.find(index)->second;
+            sprintf(gBuffer, "%s%s",
+                    syncCommand,
+                    a->getSyncString());
+            SendThroughSocket(socket, getIndex, strlen(getIndex));
+        }
     }
     
     return;

@@ -8,6 +8,7 @@ using namespace std;
 class Article{
     private: 
         const int id;
+        int parentId;
         string author;
         string title;
         string contents;
@@ -21,12 +22,22 @@ class Article{
         /**
          * Constructor
          */
-        Article(const string, const string, const string, int index);
+        Article(const string, const string, const string, int);
         
         /**
          * get the id of the article
          */
         int getID() const;
+
+        /**
+         * Get the id of the article's parent
+         */
+        int getParentID() const;
+
+        /**
+         * Set parent ID
+         */
+        void setParentID(int);
 
         /**
          * get the author of the article

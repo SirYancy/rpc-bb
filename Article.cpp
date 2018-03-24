@@ -22,6 +22,22 @@ int Article::getID() const
 }
 
 /**
+ * Get the id of the article's parent
+ */
+int Article::getParentID() const
+{
+    return parentId;
+}
+
+/**
+ * Set parent ID
+ */
+void Article::setParentID(int i)
+{
+    parentId = i;
+}
+
+/**
  * get the author of the article
  */
 string Article::getAuthor() const
@@ -101,20 +117,11 @@ string Article::getSyncString() const
     ostringstream output;
 
     output 
-        << id << ";"
         << author << ";"
         << title << ";"
-        << contents;
-
-    if(next != NULL)
-        output << next->getID() << ";";
-    else
-        output << ";";
-
-    if(reply != NULL)
-        output << reply->getID() << ";";
-    else
-        output << ";";
+        << contents << ";"
+        << id << ";"
+        << parentId;
 
     return output.str();
 }
