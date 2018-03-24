@@ -170,6 +170,10 @@ char* serverHandlerQuorum(char *buffer)
     std::map<int, int> serverMap = GetMap();
 
     char *command = strtok(buffer, ";");
+    char *tok1 = strtok(NULL, ";");
+    char *tok2 = strtok(NULL, ";");
+    char *tok3 = strtok(NULL, ";");
+    char *tok4 = strtok(NULL, ";");
 
     if (strcmp(command, "getIndex") == 0) {
         // Return article index
@@ -183,8 +187,11 @@ char* serverHandlerQuorum(char *buffer)
 
         return gBuffer;
     } else if (strcmp(command, "post") == 0) {
+        printf("POSTING\n");
         int n = serverMap.size();
         int m = (n + 2 - 1) / 2;
+
+        post_article(tok1, tok2, tok3, atoi(tok4));
 
         vector<int> keys = getQuorum(m);
 
@@ -196,40 +203,29 @@ char* serverHandlerQuorum(char *buffer)
             map<int,int>::iterator it = serverMap.find(i);
 
             syncServer(it->second);
-
-            //SendThroughSocket(s, gBuffer, strlen(gBuffer));
-            memset(tmp, '\0', MAX_LEN);
-            //RecvFromSocket(s, tmp);
-
-            //printf("%d %d %s ", i, s, tmp);
-
-            if (strcmp(tmp, "ACK;") == 0) {
-                // Go to next one;
-                printf("Received ACK\n");
-            }
         }
 
         printf("\n");
 
-        return NULL;
+        return gBuffer;
     }
-    return NULL;
+    return gBuffer;
 }
 
 char* clientHandler(char *req, char *type)
 { 
     if (strcmp (type, "ryw") == 0 ) {
-	return clientHandlerRYW(req);
+        return clientHandlerRYW(req);
     }
     else if (strcmp (type, "quorum") == 0) { 
         return clientHandlerQuorum(req);
     }
     else if (strcmp (type, "seq") == 0) { 
-	return clientHandlerSeq(req);
+        return clientHandlerSeq(req);
     }
     else { 
-	printf("error in consistency type\n"); 
-	return NULL; 
+        printf("error in consistency type\n"); 
+        return NULL; 
     }
 }
 
@@ -357,6 +353,7 @@ char *clientHandlerQuorum(char *req){
     }
     return NULL;
 }
+
 void receivingHandler(char *buffer) {
     printf("receiving hdl: %s\n", buffer);
     char *command = strtok(buffer, ";");
@@ -367,12 +364,13 @@ void receivingHandler(char *buffer) {
     char *tok4 = strtok(NULL, ";");
     char *tok5 = strtok(NULL, ";");
 
-    if (strcmp(command, "getIndex") == 0) {
+    if (strcmp(command, "queryIndex") == 0) {
         // Coordinator wants this server's current index/version
-        printf("Received index request from server: %d\n", gIndex);
+        printf("Received index request from Coordinator: %d\n", gIndex);
         memset(gBuffer, '\0', MAX_LEN);
         sprintf(gBuffer, "index;%d", gIndex);
         SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
+        printf("Sent Index\n");
         return;
     } else if (strcmp(command, "post") == 0) {
         printf("Received post request from coordinator\n");
@@ -401,10 +399,6 @@ void receivingHandler(char *buffer) {
         {
             post_reply(targetID, tok1, tok2, tok3, atoi(tok4));
         }
-
-
-
-        
     }
 }
 
@@ -566,12 +560,15 @@ vector<int> getQuorum(int num)
 
 void syncServer(int socket)
 {
-    char *getIndex = "getIndex;";
+    printf("Syncing Quroum\n");
+    char *getIndex = "queryIndex;";
     char *syncCommand = "sync;";
     char cIndex[10];
     memset(gBuffer, '\0', strlen(cIndex));
+
     SendThroughSocket(socket, getIndex, strlen(getIndex));
     RecvFromSocket(socket, cIndex);
+    printf("cIndex: %s\n", cIndex);
 
     int index = atoi(strtok(cIndex, ";"));
     if(index < gIndex)

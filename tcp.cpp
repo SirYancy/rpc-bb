@@ -59,7 +59,7 @@ int RequestIndex(void) {
     memset(buf, '\0', MAX_LEN);
     RecvFromSocket(gCoordinatorSocket, buf);
 
-    printf("%s, %d", buf, atoi(buf));
+    //printf("\n%s, %d\n", buf, atoi(buf));
 
     return atoi(buf);
 }
@@ -111,8 +111,8 @@ bool InitServerWithHandler(int port, void *(*handler)(void *), char *type) {
 
         printf("New client connected\n");
 
-	struct1.pSocket = newSocket;
-	struct1.type = type;
+        struct1.pSocket = newSocket;
+        struct1.type = type;
 
         if(pthread_create(&clientThread, NULL, handler, (void *)&struct1) < 0) {
             printf("Cannot create thread\n");
@@ -257,6 +257,9 @@ void *client_handler(void *ptr) {
     return NULL;
 }
 
+/**
+ * Handles messages from server
+ */
 void *server_handler(void *ptr) {
     struct thread_args *args = (struct thread_args *) ptr;
     int socket = *((int *)(args->pSocket));
@@ -292,7 +295,7 @@ void *server_handler(void *ptr) {
     }
 
     if(recvSize == 0) {
-        printf("Client disconnected\n");
+        printf("Server disconnected\n");
         fflush(stdout);
     } else if(recvSize == -1) {
         printf("Recv error");
@@ -304,6 +307,9 @@ void *server_handler(void *ptr) {
     return NULL;
 }
 
+/**
+ * Handles messages from Coordinator
+ */
 void *receiving_handler(void *pSocket) {
     int socket = *((int *)pSocket);
     int recvSize;
@@ -318,7 +324,7 @@ void *receiving_handler(void *pSocket) {
     }
 
     if(recvSize == 0) {
-        printf("Client disconnected\n");
+        printf("Coordinator disconnected\n");
         fflush(stdout);
     } else if(recvSize == -1) {
         printf("Recv error");
@@ -337,7 +343,7 @@ bool SendThroughSocket(int socket, char *buffer, int len) {
     if(len == ret) {
         return true;
     } else if(ret == -1) {
-	printf("Send error\n");
+        printf("Send error\n");
         return false;
     } else {
         // Size is not the same?
