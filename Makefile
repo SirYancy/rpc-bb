@@ -1,7 +1,7 @@
 CXX = g++
 FLAGS += -std=c++11 -pthread -Wall -g
 
-all: server_tcp client_tcp coordinator_tcp
+all: server_tcp client_tcp test_client coordinator_tcp
 
 # Objects
 
@@ -22,6 +22,9 @@ server_tcp.o: server_tcp.cpp
 coordinator_tcp.o: coordinator_tcp.cpp
 	$(CXX) $(FLAGS) -c coordinator_tcp.cpp
 
+test_client.o: test_client.c
+	$(CXX) $(FLAGS) -c test_client.c
+
 # Executables
 
 server_tcp: Article.o tcp.o backend.o server_tcp.o 
@@ -33,5 +36,8 @@ client_tcp: Article.o client_tcp.o tcp.o backend.o
 coordinator_tcp: Article.o coordinator_tcp.o tcp.o backend.o
 	$(CXX) $(FLAGS) -o coordinator_tcp Article.o backend.o coordinator_tcp.o tcp.o
 
+test_client: Article.o test_client.o tcp.o backend.o
+	$(CXX) $(FLAGS) -o test_client Article.o backend.o test_client.o tcp.o
+
 clean:
-	$(RM) core *.o server_tcp client_tcp coordinator_tcp
+	$(RM) core *.o server_tcp client_tcp coordinator_tcp test_client

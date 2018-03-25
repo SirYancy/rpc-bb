@@ -230,7 +230,7 @@ char* serverHandlerQuorum(char *buffer)
 
         printf("\n");
 
-        return NULL;
+        return "ACK";
     } else if (strcmp(command, "reply") == 0) {
         char tmp[MAX_LEN];
         memset(tmp, '\0', MAX_LEN);
@@ -451,7 +451,10 @@ char *clientHandlerQuorum(char *req){
         printf("Client hdl backend:%s\n", gBuffer);
         SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
 
-        return NULL;
+        int len = RecvFromSocket(GetCoordinatorSocket(), gBuffer);
+        gBuffer[len] = '\0';
+
+        return gBuffer;
 
     } else if (strcmp(command, "reply") == 0) {
         printf("REPLYING: Requesting Index from Coordinator\n");

@@ -227,6 +227,9 @@ bool ConnectToCoordinator(char *serverIP, int serverPort, int localPort) {
     return true;
 }
 
+/**
+ * Handles messages sent by clients
+ */
 void *client_handler(void *ptr) {
     struct thread_args *args = (struct thread_args *)ptr;
     int socket = *((int *)(args->pSocket));
