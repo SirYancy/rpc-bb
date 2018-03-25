@@ -142,37 +142,6 @@ char* serverHandlerSeq(char* buffer)
 
 char* serverHandlerRYW(char *buffer)
 {
-/*    //handler by the coordinator to handle requests from servers 
-    // Clear buffer
-    memset(gBuffer, '\0', MAX_LEN);
-    strcpy(gBuffer, buffer);
-
-    char *command = strtok(buffer, ";");
-
-    if (strcmp(command, "getIndex") == 0) {
-        // Return article index
-        sprintf(gBuffer, "%d", gIndex);
-
-        printf("gIndex: %d\n", gIndex);
-        printf("gBuffer: %s\n", gBuffer);
-
-        // Increase index
-        gIndex++;
-
-        return gBuffer;
-    } else if (strcmp(command, "getCopy") == 0) {
-        std::map<int, int> serverMap = GetMap(); 
-	std::ostringstream s;
-	boost::archive::text_oarchive arch(s);
-	arch << serverMap;
-	string out_map = s.str();
-	char *cstr = new char[out_map.length() + 1];
-	strcpy(cstr, out_map.c_str());
-	sprintf(gBuffer, "%s", cstr);
-	return gBuffer;
-    } 
-  */  
-    // TODO: edit it such that it only sends to other servers, not all servers 
     serverHandlerSeq(buffer);
 }
 
