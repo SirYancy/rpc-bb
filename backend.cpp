@@ -4,10 +4,11 @@
 #include <map>
 #include <stdio.h>
 #include <string.h>
+#include <vector> 
+#include <random>
 #include "Article.h" 
 #include "tcp.h"
 #include "backend.h"
-#include <vector> 
 
 #define PORT 8080
 
@@ -19,7 +20,9 @@ map<int, Article*> articleMap;
 
 Article *last;
 
-int gIndex = 1;
+int gIndex = 0;
+
+auto rng = std::default_random_engine {};
 
 char* handle_request(char *command, ROLE role, char *type) {
     switch (role) {
@@ -177,14 +180,15 @@ char* serverHandlerQuorum(char *buffer)
 
     if (strcmp(command, "getIndex") == 0) {
         printf("Server requested new index\n");
+
+        // Increase index
+        gIndex++;
+
         // Return article index
         sprintf(gBuffer, "%d", gIndex);
 
         printf("gIndex: %d\n", gIndex);
         printf("gBuffer: %s\n", gBuffer);
-
-        // Increase index
-        gIndex++;
 
         printf("New gIndex: %d\n", gIndex);
 
@@ -565,7 +569,7 @@ vector<int> getQuorum(int num)
     std::vector<int> indices;
     for (int i = 0; i < serverMap.size(); i++) indices.push_back(i);
 
-    std::random_shuffle( indices.begin(), indices.end() );
+    std::shuffle(std::begin(indices), std::end(indices), rng);
     indices.resize(num);
 
     std::vector<int> keys;
@@ -602,12 +606,21 @@ int getLead(vector<int> *keys)
     for(auto const& i: *keys)
     {
         map<int,int>::iterator it = serverMap.find(i);
+        int nIndex;
 
         memset(cIndex, '\0', 10);
         SendThroughSocket(it->second, queryIndex, strlen(queryIndex));
         RecvFromSocket(it->second, cIndex);
-        int nIndex = atoi(strtok(cIndex, ";"));
-        printf("Test Index: %d\n", nIndex);
+        char *cmd = strtok(cIndex, ";");
+
+        if(strcmp(cmd, "index") == 0)
+        {
+            nIndex = atoi(strtok(NULL, ";"));
+            printf("Test Index: %d\n", nIndex);
+        }else{
+            printf("ERROR: Didn't send the right code back\n");
+            return NULL;
+        }
 
         if (nIndex > index)
         {
@@ -624,40 +637,63 @@ void syncServer(int leadSocket, int syncSocket)
 {
     printf("Syncing Server\n");
     char tmp[MAX_LEN];
+    char article[MAX_LEN];
     memset(gBuffer, '\0', MAX_LEN);
+    int leadIndex, syncIndex;
+    char *cmd;
 
-    SendThroughSocket(syncSocket, queryIndex, strlen(queryIndex));
-    RecvFromSocket(syncSocket, cIndex);
-
-    int syncIndex = atoi(strtok(cIndex, ";"));
-    printf("Received syncIndex: %d\n", syncIndex);
-
+    // Get Lead index
+    memset(cIndex, '\0', 10);
     SendThroughSocket(leadSocket, queryIndex, strlen(queryIndex));
     RecvFromSocket(leadSocket, cIndex);
+    cmd = strtok(cIndex, ";");
 
-    int leadIndex = atoi(strtok(cIndex, ";"));
+    if(strcmp(cmd, "index") == 0)
+    {
+        leadIndex = atoi(strtok(NULL, ";"));
+        printf("Received leadIndex: %d\n", leadIndex);
+    }else{
+        printf("ERROR: Didn't send the right code back\n");
+        return;
+    }
 
-    printf("Received leadIndex: %d\n", leadIndex);
+    // Get target index
+    memset(cIndex, '\0', 10);
+    SendThroughSocket(syncSocket, queryIndex, strlen(queryIndex));
+    RecvFromSocket(syncSocket, cIndex);
+    cmd = strtok(cIndex, ";");
+    if(strcmp(cmd, "index") == 0)
+    {
+        syncIndex = atoi(strtok(NULL, ";"));
+        printf("Received syncIndex: %d\n", syncIndex);
+    }else{
+        printf("ERROR: Didn't send the right code back\n");
+        return;
+    }
 
+    // Sync Servers if necessary
     if(syncIndex < leadIndex)
     {
+        printf("Syncing Servers\n");
         // increment by one to get next article
-        syncIndex++;
-        for(syncIndex; syncIndex < leadIndex; syncIndex++)
+        for(syncIndex; syncIndex <= leadIndex; syncIndex++)
         {
             memset(gBuffer, '\0', MAX_LEN);
             memset(tmp, '\0', MAX_LEN);
+            memset(article, '\0', MAX_LEN);
 
             // Get the next article
             sprintf(gBuffer, "syncarticle;%d", syncIndex);
             SendThroughSocket(leadSocket, gBuffer, strlen(gBuffer));
-            int recvlen = RecvFromSocket(leadSocket, gBuffer);
-            gBuffer[recvlen] = '\0';
+            int recvlen = RecvFromSocket(leadSocket, article);
+            article[recvlen] = '\0';
 
             printf("Article to sync: %s\n", gBuffer);
             sprintf(gBuffer, "%s%s",
                     syncCommand,
-                    gBuffer);
+                    article);
+
+            printf("Sending sync command: %s\n", gBuffer);
 
             // Send it to the sync target
             SendThroughSocket(syncSocket, gBuffer, strlen(gBuffer));
@@ -668,6 +704,4 @@ void syncServer(int leadSocket, int syncSocket)
             }
         }
     }
-    
-    return;
 }
