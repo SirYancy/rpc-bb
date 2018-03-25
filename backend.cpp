@@ -295,10 +295,11 @@ char *clientHandlerRYW(char *req)
     else if (strcmp(token, "reply") == 0)
     { 
 	int index = RequestIndex(); 
-	post_reply(atoi(tok1), tok2, "rep", tok3, atoi(tok4));
+	post_reply(atoi(tok1), tok2, "rep", tok3, index);
         sprintf(gBuffer, "%s;%d;", gBuffer, index);
 	printf("ClientRYW Reply: %s\n", gBuffer);
 	SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
+        return NULL;
     }
     else if (strcmp(token, "list") == 0)
     {
@@ -436,6 +437,11 @@ bool post_reply(int id, char *user, char* title, char *article, int index)
     string t_str(title);
     string a_str(article);
     printf("Article: %s\n", article);
+    if (articleMap.find(index) != articleMap.end())
+    {
+        printf("Already posted this reply\n");
+        return 1;
+    }
     Article *a = new Article(u_str, t_str, a_str, index);
 
     articleMap.insert(make_pair(a->getID(), a));

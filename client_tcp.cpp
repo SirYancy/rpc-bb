@@ -53,6 +53,7 @@ void *client_thread_func(void *args)
                 "5 - Exit",
                 "> ");
         scanf("%d", &menu_choice);
+
         //flush input buffer
         int c;
         while ((c = getchar()) != '\n' && c != EOF) { }
@@ -100,7 +101,7 @@ void *client_thread_func(void *args)
                     username,
                     content);
                 SendThroughSocket(gServerSocket, buffer, strlen(buffer));
-                RecvFromSocket(gServerSocket, buffer);
+               // RecvFromSocket(gServerSocket, buffer);
                 printf("%s\n", buffer);
                 break;
             case 5:
