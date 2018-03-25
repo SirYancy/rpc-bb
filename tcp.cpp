@@ -236,7 +236,8 @@ void *client_handler(void *ptr) {
     char *consType = (char *)args->type;
 
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
-        buffer[recvSize] = '\0';
+        buffer[MAX_LEN] = '\0';
+	message = NULL;
         printf("tcp Client hdl: %s\n", buffer);
         message = handle_request(buffer, CLIENT, consType);
         printf("Message: \n%s\n", message);
@@ -281,9 +282,10 @@ void *server_handler(void *ptr) {
 
     while((recvSize = recv(socket, buffer, MAX_LEN,0)) > 0) {
         // Handle messages from servers
-        buffer[recvSize] = '\0';
+        buffer[MAX_LEN] = '\0';
         printf("tcp Server hdl: %s\n", buffer);
-        message = handle_request(buffer, SERVER, consType);
+        message = NULL;
+	message = handle_request(buffer, SERVER, consType);
         printf("Message: \n%s\n", message);
         if (message != NULL) {
             send(socket, message, strlen(message), 0);

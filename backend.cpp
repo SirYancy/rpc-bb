@@ -388,13 +388,15 @@ char *get_article(int id)
     printf("get article\n");
     Article *target = articleMap.find(id)->second;
 
-    gBuffer[0] = 0;
+    memset(gBuffer, '\0', MAX_LEN);
 
-    sprintf(gBuffer, "%d - %s - %s\n",
+    sprintf(gBuffer, "%d - %s - %s - %s\n",
             target->getID(),
             target->getAuthor().c_str(),
+            target->getTitle().c_str(),
             target->getContent().c_str());
 
+    printf("gBuffer %s\n", gBuffer);
     return gBuffer;
 }
 
