@@ -201,7 +201,11 @@ char* serverHandlerQuorum(char *buffer)
 
         printf("POSTING\n");
         int n = serverMap.size();
-        int m = (n + 2 - 1) / 2;
+        int m = (n + 1) / 2;
+
+        // Add one more server if the number of servers is even
+        if(n % 2 == 0)
+            m++;
 
         vector<int> keys = getQuorum(m);
         // Most recent index
@@ -237,7 +241,7 @@ char* serverHandlerQuorum(char *buffer)
 
         printf("REPLYING\n");
         int n = serverMap.size();
-        int m = (n + 2 - 1) / 2;
+        int m = (n + 1) / 2;
 
         // Add one more server if the number of servers is even
         if(n % 2 == 0)

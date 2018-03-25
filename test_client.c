@@ -14,7 +14,8 @@ int gReceivingSocket = 0;
 
 int main(int argc, char *argv[]) {
     clock_t start, end;
-    double timedelta;
+    double postdelta;
+    double getdelta;
 
     char buffer[MAX_LEN];
 
@@ -30,7 +31,7 @@ int main(int argc, char *argv[]) {
 
         if(size == 0)
         {
-            fprintf(Output, "Post Number, Time\n");
+            fprintf(Output, "Post Number, Post Time, Get Time\n");
         }
     }
 
@@ -54,12 +55,25 @@ int main(int argc, char *argv[]) {
         end = clock();
 
         buffer[len] = '\0';
+        printf("\n%s RECEIVED\n", buffer);
+        postdelta = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+        memset(buffer, '\0', MAX_LEN);
+        sprintf(buffer, "article;%d", i);
+        start = clock();
+
+        SendThroughSocket(gServerSocket, buffer, strlen(buffer));
+        len = RecvFromSocket(gServerSocket, buffer);
+
+        end = clock();
+
+        buffer[len] = '\0';
 
         printf("\n%s RECEIVED\n", buffer);
 
-        timedelta = ((double) (end - start)) / CLOCKS_PER_SEC;
+        getdelta = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-        fprintf(Output, "%d, %f\n", i, timedelta);
+        fprintf(Output, "%d, %f, %f\n", i, postdelta, getdelta);
     }
 
 }
