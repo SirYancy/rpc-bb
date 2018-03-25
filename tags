@@ -7,34 +7,68 @@
 ARTICLE_H	Article.h	2;"	d
 Article	Article.cpp	/^Article::Article(const string a, const string t, const string c, int index)$/;"	f	class:Article
 Article	Article.h	/^class Article{$/;"	c
+Article	old/bb.h	/^	char *Article;$/;"	m	struct:post_1_argument
+Article	old/bb.h	/^	char *Article;$/;"	m	struct:reply_1_argument
 BACKEND_H	backend.h	4;"	d
+BACKEND_H	old/backend.h	2;"	d
+BULLETIN_PROG	old/bb.h	30;"	d
+BULLETIN_VERSION	old/bb.h	31;"	d
 CLIENT	backend.h	/^enum ROLE {CLIENT, SERVER, COORDINATOR};$/;"	e	enum:ROLE
 COORDINATOR	backend.h	/^enum ROLE {CLIENT, SERVER, COORDINATOR};$/;"	e	enum:ROLE
+CXX	Makefile	/^CXX = g++$/;"	m
+Choose	old/bb.h	40;"	d
+Choose	old/bb.h	55;"	d
 ConnectToCoordinator	tcp.cpp	/^bool ConnectToCoordinator(char *serverIP, int serverPort, int localPort) {$/;"	f
 ConnectToServer	tcp.cpp	/^bool ConnectToServer(char *serverIP, int serverPort) {$/;"	f
 GetCoordinatorSocket	tcp.cpp	/^int GetCoordinatorSocket(void) {$/;"	f
 GetMap	tcp.cpp	/^std::map<int, int> GetMap(void) {$/;"	f
 GetReceivingSocket	tcp.cpp	/^int GetReceivingSocket(void) {$/;"	f
 GetServerSocket	tcp.cpp	/^int GetServerSocket(void) {$/;"	f
+InitClient	old/tcp.cpp	/^bool InitClient(char *serverIP, int serverPort, int &serverSocket) {$/;"	f
+InitCoordinator	old/tcp.cpp	/^bool InitCoordinator(int port) {$/;"	f
 InitCoordinator	tcp.cpp	/^bool InitCoordinator(int port, char* type) {$/;"	f
+InitServer	old/tcp.cpp	/^bool InitServer(int port) {$/;"	f
 InitServer	tcp.cpp	/^bool InitServer(int port, char *type) {$/;"	f
 InitServerWithHandler	tcp.cpp	/^bool InitServerWithHandler(int port, void *(*handler)(void *), char *type) {$/;"	f
 MAX_CONNECTION	tcp.h	11;"	d
 MAX_LEN	tcp.h	12;"	d
-PORT	backend.cpp	12;"	d	file:
+PORT	backend.cpp	13;"	d	file:
+Post	old/bb.h	34;"	d
+Post	old/bb.h	49;"	d
 ROLE	backend.h	/^enum ROLE {CLIENT, SERVER, COORDINATOR};$/;"	g
+Read	old/bb.h	37;"	d
+Read	old/bb.h	52;"	d
+RecvFromSocket	old/tcp.cpp	/^int RecvFromSocket(int socket, char *buffer) {$/;"	f
 RecvFromSocket	tcp.cpp	/^int RecvFromSocket(int socket, char *buffer) {$/;"	f
+Reply	old/bb.h	43;"	d
+Reply	old/bb.h	58;"	d
 RequestIndex	tcp.cpp	/^int RequestIndex(void) {$/;"	f
 SERVER	backend.h	/^enum ROLE {CLIENT, SERVER, COORDINATOR};$/;"	e	enum:ROLE
+SIG_PF	old/bb_svc.c	16;"	d	file:
 SendACK	tcp.cpp	/^void SendACK(int socket) {$/;"	f
+SendThroughSocket	old/tcp.cpp	/^bool SendThroughSocket(int socket, char *buffer, int len) {$/;"	f
 SendThroughSocket	tcp.cpp	/^bool SendThroughSocket(int socket, char *buffer, int len) {$/;"	f
+TIMEOUT	old/bb_clnt.c	/^static struct timeval TIMEOUT = { 25, 0 };$/;"	v	typeref:struct:timeval	file:
+_BB_H_RPCGEN	old/bb.h	7;"	d
+_choose_1	old/bb_svc.c	/^_choose_1 (int  *argp, struct svc_req *rqstp)$/;"	f	file:
+_post_1	old/bb_svc.c	/^_post_1 (post_1_argument *argp, struct svc_req *rqstp)$/;"	f	file:
+_read_1	old/bb_svc.c	/^_read_1 (void  *argp, struct svc_req *rqstp)$/;"	f	file:
+_reply_1	old/bb_svc.c	/^_reply_1 (reply_1_argument *argp, struct svc_req *rqstp)$/;"	f	file:
 articleCount	Article.h	/^        static int articleCount;$/;"	m	class:Article
 articleMap	backend.cpp	/^map<int, Article*> articleMap;$/;"	v
+articleMap	old/backend.cpp	/^map<int, Article*> articleMap;$/;"	v
 author	Article.h	/^        string author;$/;"	m	class:Article
+buffer	old/backend.cpp	/^char buffer[1000];$/;"	v
+bulletin_prog_1	old/bb_svc.c	/^bulletin_prog_1(struct svc_req *rqstp, register SVCXPRT *transp)$/;"	f	file:
+cIndex	backend.cpp	/^char cIndex[10];$/;"	v
+choose	old/bb_client.c	/^void choose(int i, CLIENT *clnt)$/;"	f
+choose_1	old/bb_clnt.c	/^choose_1(int id,  CLIENT *clnt)$/;"	f
+choose_1_svc	old/bb_server.c	/^choose_1_svc(int id,  struct svc_req *rqstp)$/;"	f
 clientHandler	backend.cpp	/^char* clientHandler(char *req, char *type)$/;"	f
 clientHandlerQuorum	backend.cpp	/^char *clientHandlerQuorum(char *req){ $/;"	f
 clientHandlerRYW	backend.cpp	/^char *clientHandlerRYW(char *req)$/;"	f
 clientHandlerSeq	backend.cpp	/^char* clientHandlerSeq(char *req)$/;"	f
+client_handler	old/tcp.cpp	/^void *client_handler(void *pSocket)$/;"	f
 client_handler	tcp.cpp	/^void *client_handler(void *ptr) {$/;"	f
 client_thread_func	client_tcp.cpp	/^void *client_thread_func(void *args)$/;"	f
 contents	Article.h	/^        string contents;$/;"	m	class:Article
@@ -53,30 +87,60 @@ gSocketMap	tcp.cpp	/^std::map<int, int> gSocketMap;$/;"	v
 getAuthor	Article.cpp	/^string Article::getAuthor() const$/;"	f	class:Article
 getContent	Article.cpp	/^string Article::getContent() const$/;"	f	class:Article
 getID	Article.cpp	/^int Article::getID() const$/;"	f	class:Article
+getLead	backend.cpp	/^int getLead(vector<int> *keys)$/;"	f
 getNext	Article.cpp	/^Article *Article::getNext() const$/;"	f	class:Article
+getParentID	Article.cpp	/^int Article::getParentID() const$/;"	f	class:Article
 getQuorum	backend.cpp	/^vector<int> getQuorum(int num)$/;"	f
 getReply	Article.cpp	/^Article *Article::getReply() const$/;"	f	class:Article
+getSyncString	Article.cpp	/^string Article::getSyncString() const$/;"	f	class:Article
 getTitle	Article.cpp	/^string Article::getTitle() const$/;"	f	class:Article
 get_article	backend.cpp	/^char *get_article(int id)$/;"	f
+get_article	old/backend.cpp	/^char *get_article(int id)$/;"	f
 get_list	backend.cpp	/^char *get_list()$/;"	f
+get_list	old/backend.cpp	/^char *get_list()$/;"	f
 get_thread	backend.cpp	/^void get_thread(Article* curr, int depth)$/;"	f
+get_thread	old/backend.cpp	/^void get_thread(Article* curr, int depth)$/;"	f
 handle_request	backend.cpp	/^char* handle_request(char *command, ROLE role, char *type) {$/;"	f
 id	Article.h	/^        const int id;$/;"	m	class:Article
+id	old/bb.h	/^	int id;$/;"	m	struct:reply_1_argument
 last	backend.cpp	/^Article *last;$/;"	v
+last	old/backend.cpp	/^Article *last;$/;"	v
 live	client_tcp.cpp	/^int live = 1;$/;"	v
 main	bb_server.cpp	/^int main()$/;"	f
 main	client_tcp.cpp	/^int main(int argc, char *argv[]) {$/;"	f
 main	coordinator_tcp.cpp	/^int main(int argc, char *argv[]) {$/;"	f
+main	old/bb_client.c	/^int main (int argc, char *argv[])$/;"	f
+main	old/bb_svc.c	/^main (int argc, char **argv)$/;"	f
 main	server_tcp.cpp	/^int main(int argc, char *argv[]) {$/;"	f
 next	Article.h	/^        Article *next;$/;"	m	class:Article
 pSocket	tcp.cpp	/^    int *pSocket; $/;"	m	struct:thread_args	file:
+parentId	Article.h	/^        int parentId;$/;"	m	class:Article
+post	old/bb_client.c	/^void post(char *user, char *article, CLIENT *clnt)$/;"	f
+post_1	old/bb_clnt.c	/^post_1(char *user, char *Article,  CLIENT *clnt)$/;"	f
+post_1_argument	old/bb.h	/^struct post_1_argument {$/;"	s
+post_1_argument	old/bb.h	/^typedef struct post_1_argument post_1_argument;$/;"	t	typeref:struct:post_1_argument
+post_1_svc	old/bb_server.c	/^post_1_svc(char *user, char *article,  struct svc_req *rqstp)$/;"	f
 post_article	backend.cpp	/^bool post_article(char *user, char *title, char *article, int index)$/;"	f
+post_article	old/backend.cpp	/^bool_t post_article(char *user, char *article)$/;"	f
 post_reply	backend.cpp	/^bool post_reply(int id, char *user, char* title, char *article, int index)$/;"	f
+post_reply	old/backend.cpp	/^bool_t post_reply(int id, char *user, char *article)$/;"	f
 print_article	backend.cpp	/^void print_article(Article *a)$/;"	f
+print_article	old/backend.cpp	/^void print_article(Article *a)$/;"	f
 print_list	backend.cpp	/^void print_list()$/;"	f
-receivingHandler	backend.cpp	/^void receivingHandler(char *buffer) {$/;"	f
+print_list	old/backend.cpp	/^void print_list()$/;"	f
+queryIndex	backend.cpp	/^char *queryIndex = "queryIndex;";$/;"	v
+read	old/bb_client.c	/^void read(CLIENT *clnt)$/;"	f
+read_1	old/bb_clnt.c	/^read_1(CLIENT *clnt)$/;"	f
+read_1_svc	old/bb_server.c	/^read_1_svc(struct svc_req *rqstp)$/;"	f
+receivingHandler	backend.cpp	/^char *receivingHandler(char *buffer) {$/;"	f
 receiving_handler	tcp.cpp	/^void *receiving_handler(void *pSocket) {$/;"	f
 reply	Article.h	/^        Article *reply;$/;"	m	class:Article
+reply	old/bb_client.c	/^void reply(int i, char *user, char *article, CLIENT *clnt)$/;"	f
+reply_1	old/bb_clnt.c	/^reply_1(int id, char *user, char *Article,  CLIENT *clnt)$/;"	f
+reply_1_argument	old/bb.h	/^struct reply_1_argument {$/;"	s
+reply_1_argument	old/bb.h	/^typedef struct reply_1_argument reply_1_argument;$/;"	t	typeref:struct:reply_1_argument
+reply_1_svc	old/bb_server.c	/^reply_1_svc(int id, char *user, char *article,  struct svc_req *rqstp)$/;"	f
+rng	backend.cpp	/^auto rng = std::default_random_engine {};$/;"	v
 serverHandler	backend.cpp	/^char* serverHandler(char *buffer, char *type) {$/;"	f
 serverHandlerQuorum	backend.cpp	/^char* serverHandlerQuorum(char *buffer)$/;"	f
 serverHandlerRYW	backend.cpp	/^char* serverHandlerRYW(char *buffer)$/;"	f
@@ -84,9 +148,17 @@ serverHandlerSeq	backend.cpp	/^char* serverHandlerSeq(char* buffer)$/;"	f
 serverPort	client_tcp.cpp	/^int serverPort;$/;"	v
 server_handler	tcp.cpp	/^void *server_handler(void *ptr) {$/;"	f
 setNext	Article.cpp	/^void Article::setNext(Article *a)$/;"	f	class:Article
+setParentID	Article.cpp	/^void Article::setParentID(int i)$/;"	f	class:Article
 setReply	Article.cpp	/^void Article::setReply(Article *a)$/;"	f	class:Article
+setup_rpc	old/bb_client.c	/^CLIENT *setup_rpc(char *host)$/;"	f
 struct1	tcp.cpp	/^struct thread_args struct1;$/;"	v	typeref:struct:thread_args
+syncCommand	backend.cpp	/^char *syncCommand = "sync;";$/;"	v
+syncServer	backend.cpp	/^void syncServer(int leadSocket, int syncSocket)$/;"	f
 thread_args	tcp.cpp	/^struct thread_args$/;"	s	file:
 title	Article.h	/^        string title;$/;"	m	class:Article
 toString	Article.cpp	/^string Article::toString() const$/;"	f	class:Article
 type	tcp.cpp	/^    char *type;$/;"	m	struct:thread_args	file:
+user	old/bb.h	/^	char *user;$/;"	m	struct:post_1_argument
+user	old/bb.h	/^	char *user;$/;"	m	struct:reply_1_argument
+xdr_post_1_argument	old/bb_xdr.c	/^xdr_post_1_argument (XDR *xdrs, post_1_argument *objp)$/;"	f
+xdr_reply_1_argument	old/bb_xdr.c	/^xdr_reply_1_argument (XDR *xdrs, reply_1_argument *objp)$/;"	f

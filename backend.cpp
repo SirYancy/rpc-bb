@@ -27,11 +27,13 @@ auto rng = std::default_random_engine {};
 char* handle_request(char *command, ROLE role, char *type) {
     switch (role) {
         case CLIENT:
+            // Server handles a message from a client
             return clientHandler(command, type);
         case SERVER:
+            // Coordinator handles a message from a server
             return serverHandler(command, type);
         case COORDINATOR:
-            // Handle message received from coordinator
+            // Server handles a message from the coordinator
             return receivingHandler(command);
             break;
         default:
@@ -43,7 +45,7 @@ char* handle_request(char *command, ROLE role, char *type) {
 char* serverHandler(char *buffer, char *type) {
     if (strcmp(type, "seq") == 0)
     { 
-	return serverHandlerSeq(buffer);
+        return serverHandlerSeq(buffer);
     }
     else if (strcmp (type, "quorum") == 0)
     {
@@ -51,12 +53,12 @@ char* serverHandler(char *buffer, char *type) {
     }
     else if (strcmp (type, "ryw") == 0)
     { 
-	return serverHandlerRYW(buffer);
+        return serverHandlerRYW(buffer);
     }
     else 
     { 
         printf("wrong consistency type\n");
-	return NULL;    
+        return NULL;    
     }
 }
 
@@ -130,7 +132,7 @@ char* serverHandlerSeq(char* buffer)
 
 char* serverHandlerRYW(char *buffer)
 {
-/*    //handler by the coordinator to handle requests from servers 
+    /*    //handler by the coordinator to handle requests from servers 
     // Clear buffer
     memset(gBuffer, '\0', MAX_LEN);
     strcpy(gBuffer, buffer);
@@ -138,28 +140,28 @@ char* serverHandlerRYW(char *buffer)
     char *command = strtok(buffer, ";");
 
     if (strcmp(command, "getIndex") == 0) {
-        // Return article index
-        sprintf(gBuffer, "%d", gIndex);
+    // Return article index
+    sprintf(gBuffer, "%d", gIndex);
 
-        printf("gIndex: %d\n", gIndex);
-        printf("gBuffer: %s\n", gBuffer);
+    printf("gIndex: %d\n", gIndex);
+    printf("gBuffer: %s\n", gBuffer);
 
-        // Increase index
-        gIndex++;
+    // Increase index
+    gIndex++;
 
-        return gBuffer;
+    return gBuffer;
     } else if (strcmp(command, "getCopy") == 0) {
-        std::map<int, int> serverMap = GetMap(); 
-	std::ostringstream s;
-	boost::archive::text_oarchive arch(s);
-	arch << serverMap;
-	string out_map = s.str();
-	char *cstr = new char[out_map.length() + 1];
-	strcpy(cstr, out_map.c_str());
-	sprintf(gBuffer, "%s", cstr);
-	return gBuffer;
+    std::map<int, int> serverMap = GetMap(); 
+    std::ostringstream s;
+    boost::archive::text_oarchive arch(s);
+    arch << serverMap;
+    string out_map = s.str();
+    char *cstr = new char[out_map.length() + 1];
+    strcpy(cstr, out_map.c_str());
+    sprintf(gBuffer, "%s", cstr);
+    return gBuffer;
     } 
-  */  
+    */  
     return NULL;
 }
 
@@ -201,7 +203,45 @@ char* serverHandlerQuorum(char *buffer)
         int n = serverMap.size();
         int m = (n + 2 - 1) / 2;
 
-        // post_article(tok1, tok2, tok3, atoi(tok4));
+        vector<int> keys = getQuorum(m);
+        // Most recent index
+        int leadSocket = getLead(&keys);
+        printf("Lead Socket: %d\n", leadSocket);
+
+        // Post the article at lead server first
+        SendThroughSocket(leadSocket, gBuffer, strlen(gBuffer));
+        RecvFromSocket(leadSocket, tmp);
+
+        if (strcmp(tmp, "ACK;") == 0) {
+            // Go to next one;
+            printf("Received ACK\n");
+        }
+
+        // Sync post with all the other servers in quorum
+        for (auto const& i: keys)
+        {
+            if(i != leadSocket)
+            {
+                map<int,int>::iterator it = serverMap.find(i);
+
+                syncServer(leadSocket, it->second);
+            }
+        }
+
+        printf("\n");
+
+        return NULL;
+    } else if (strcmp(command, "reply") == 0) {
+        char tmp[MAX_LEN];
+        memset(tmp, '\0', MAX_LEN);
+
+        printf("REPLYING\n");
+        int n = serverMap.size();
+        int m = (n + 2 - 1) / 2;
+
+        // Add one more server if the number of servers is even
+        if(n % 2 == 0)
+            m++;
 
         vector<int> keys = getQuorum(m);
         // Most recent index
@@ -230,6 +270,45 @@ char* serverHandlerQuorum(char *buffer)
         printf("\n");
 
         return NULL;
+    } else if (strcmp(command, "list") == 0) {
+        printf("LISTING\n");
+
+        int n = serverMap.size();
+        int m = (n + 1) / 2;
+
+        vector<int> keys = getQuorum(m);
+
+        // Get the most up-to-date server
+        int leadSocket = getLead(&keys);
+        printf("Lead Socket: %d\n", leadSocket);
+
+        // Get the list from the lead server
+        SendThroughSocket(leadSocket, gBuffer, strlen(gBuffer));
+
+        int len = RecvFromSocket(leadSocket, gBuffer);
+        gBuffer[len] = '\0';
+
+        return gBuffer;
+
+    } else if (strcmp(command, "article") == 0) {
+        printf("ARTICLE\n");
+
+        int n = serverMap.size();
+        int m = (n + 1) / 2;
+
+        vector<int> keys = getQuorum(m);
+
+        // Get the most up-to-date server
+        int leadSocket = getLead(&keys);
+        printf("Lead Socket: %d\n", leadSocket);
+
+        // Get the list from the lead server
+        SendThroughSocket(leadSocket, gBuffer, strlen(gBuffer));
+
+        int len = RecvFromSocket(leadSocket, gBuffer);
+        gBuffer[len] = '\0';
+
+        return gBuffer;
     }
     return NULL;
 }
@@ -329,21 +408,21 @@ char *clientHandlerRYW(char *req)
 
     if (strcmp(token, "post") == 0)
     {
-        // Request index from coordinator first
-        int index = RequestIndex();
+    // Request index from coordinator first
+    int index = RequestIndex();
 
-        printf("Index: %d\n", index);
+    printf("Index: %d\n", index);
 
-        // Request primary copy from the coordinator
-        sprintf(gBuffer, "getCopy;%s;%d;", gBuffer, index);
-        printf("ClientRYW hdl backend:%s\n", gBuffer);
-        SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
+    // Request primary copy from the coordinator
+    sprintf(gBuffer, "getCopy;%s;%d;", gBuffer, index);
+    printf("ClientRYW hdl backend:%s\n", gBuffer);
+    SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
 
-        return NULL;
+    return NULL;
     }
 
 */
-	return NULL;
+    return NULL;
 }
 
 char *clientHandlerQuorum(char *req){ 
@@ -352,16 +431,16 @@ char *clientHandlerQuorum(char *req){
     memset(gBuffer, '\0', MAX_LEN);
     printf("clientHandler: %s\n", req);
     strcpy(gBuffer, req);
-    char* token;
-    token = strtok(req, ";");
-    
+    char* command;
+    command = strtok(req, ";");
+
     char *msg;
 
     bool result;
 
-    if (strcmp(token, "post") == 0)
+    if (strcmp(command, "post") == 0)
     {
-        printf("Requestiong Index from Coordinator\n");
+        printf("POSTING: Requestiong Index from Coordinator\n");
         // Request index from coordinator first
         int index = RequestIndex();
 
@@ -373,6 +452,34 @@ char *clientHandlerQuorum(char *req){
         SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
 
         return NULL;
+
+    } else if (strcmp(command, "reply") == 0) {
+        printf("REPLYING: Requesting Index from Coordinator\n");
+
+        int index = RequestIndex();
+
+        printf("Index: %d\n", index);
+
+        sprintf(gBuffer, "%s;%d;", gBuffer, index);
+        printf("Client hdl backend:%s\n", gBuffer);
+        SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
+
+        return NULL;
+
+    } else if (strcmp(command, "list") == 0) {
+        printf("LISTING: Requesting all articles from coordinator");
+
+        SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
+        int len = RecvFromSocket(GetCoordinatorSocket(), gBuffer);
+
+        return gBuffer;
+    } else if (strcmp(command, "article") == 0) {
+        printf("ARTICLE: Geting an article\n");
+
+        SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
+        int len = RecvFromSocket(GetCoordinatorSocket(), gBuffer);
+
+        return gBuffer;
     }
     return NULL;
 }
@@ -401,13 +508,20 @@ char *receivingHandler(char *buffer) {
     } else if (strcmp(command, "reply") == 0) {
         printf("Received reply request from coordinator\n");
 
-        post_reply(atoi(tok1), tok2, "rep", tok3, atoi(tok4));
+        post_reply(atoi(tok1), tok2, "re:", tok3, atoi(tok4));
 
     } else if (strcmp(command, "list") == 0) {
-        // TODO
+        printf("Received list request from coordinator\n");
+
+        return get_list();
+
     } else if (strcmp(command, "article") == 0) {
-        // TODO
+        printf("Received article request from coordinator\n");
+
+        return get_article(atoi(tok1));
+
     } else if (strcmp(command, "sync") == 0) {
+        // For quorum Consistency. Used to sync servers
         int targetID = atoi(tok5);
 
         if(targetID == 0)
@@ -419,6 +533,7 @@ char *receivingHandler(char *buffer) {
             post_reply(targetID, tok1, tok2, tok3, atoi(tok4));
         }
     } else if (strcmp(command, "syncarticle") == 0) {
+        // For quorum Consistency. Used to sync a specific article
         int i = atoi(tok1);
         Article*a = articleMap.find(i)->second;
 
@@ -628,7 +743,7 @@ int getLead(vector<int> *keys)
             leadSocket = it->second;
         }
     }
-    
+
     return leadSocket;
 }
 
