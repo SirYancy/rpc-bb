@@ -347,6 +347,7 @@ void *receiving_handler(void *pSocket) {
 }
 
 bool SendThroughSocket(int socket, char *buffer, int len) {
+    usleep(1000);
     int ret = 0;
 
     ret = send(socket, buffer, len, 0);
