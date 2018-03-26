@@ -335,7 +335,7 @@ char* clientHandlerSeq(char *req)
         printf("Client hdl backend:%s\n", gBuffer);
         SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
 
-        return NULL;
+        return gBuffer;
     }
     else if (strcmp(token, "reply") == 0)
     {
@@ -398,7 +398,7 @@ char *clientHandlerRYW(char *req)
         printf("ClientRYW hdl backend:%s\n", gBuffer);
         SendThroughSocket(GetCoordinatorSocket(), gBuffer, strlen(gBuffer));
 
-        return NULL;
+        return gBuffer;
     }
     else if (strcmp(token, "reply") == 0)
     { 

@@ -71,7 +71,7 @@ void *client_thread_func(void *args)
                     title,
                     content);
                 SendThroughSocket(gServerSocket, buffer, strlen(buffer));
-                //RecvFromSocket(gServerSocket, buffer);
+                RecvFromSocket(gServerSocket, buffer);
                 printf("\n%s SENT\n", buffer);
                 break;
             case 2:
