@@ -68,6 +68,7 @@ int main(int argc, char *argv[]) {
 
         memset(buffer, '\0', MAX_LEN);
         sprintf(buffer, "article;%d", i);
+        sleep(1);
         start = clock();
 
         SendThroughSocket(gServerSocket, buffer, strlen(buffer));
