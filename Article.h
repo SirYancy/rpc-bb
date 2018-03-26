@@ -1,3 +1,11 @@
+/**
+ * Article.h
+ * Project 2 - Distributed bulletin Board
+ * Aparna Mahadevan
+ * Ming-Hong Yang
+ * Eric Kuha
+ */
+
 #ifndef ARTICLE_H
 #define ARTICLE_H
 

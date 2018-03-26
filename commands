@@ -1,4 +1,0 @@
-./coordinator_tcp 8100 quorum
-./server_tcp 8101 127.0.0.1 8100 8102 quorum
-./server_tcp 8103 127.0.0.1 8100 8102 quorum
-./server_tcp 8105 127.0.0.1 8100 8106 quorum

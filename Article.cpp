@@ -1,3 +1,11 @@
+/**
+ * Article.cpp
+ * Project 2 - Distributed bulletin Board
+ * Aparna Mahadevan
+ * Ming-Hong Yang
+ * Eric Kuha
+ */
+
 #include <string>
 #include <sstream>
 #include <iostream>

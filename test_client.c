@@ -1,3 +1,11 @@
+/**
+ * test_client.c
+ * Project 2 - Distributed bulletin Board
+ * Aparna Mahadevan
+ * Ming-Hong Yang
+ * Eric Kuha
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

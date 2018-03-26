@@ -1,3 +1,11 @@
+/**
+ * coordinator_tcp.cpp
+ * Project 2 - Distributed bulletin Board
+ * Aparna Mahadevan
+ * Ming-Hong Yang
+ * Eric Kuha
+ */
+
 #include <iostream>
 #include "tcp.h"
 #include "backend.h"

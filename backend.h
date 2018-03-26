@@ -1,3 +1,11 @@
+/**
+ * backend.h
+ * Project 2 - Distributed bulletin Board
+ * Aparna Mahadevan
+ * Ming-Hong Yang
+ * Eric Kuha
+ */
+
 #include "Article.h"
 #include <vector>
 #ifndef BACKEND_H

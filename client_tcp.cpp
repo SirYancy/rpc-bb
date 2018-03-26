@@ -1,3 +1,11 @@
+/**
+ * client_tcp.cpp
+ * Project 2 - Distributed bulletin Board
+ * Aparna Mahadevan
+ * Ming-Hong Yang
+ * Eric Kuha
+ */
+
 #include <string.h>
 #include <pthread.h>
 #include "tcp.h"

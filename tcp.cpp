@@ -1,3 +1,11 @@
+/**
+ * tcp.cpp
+ * Project 2 - Distributed bulletin Board
+ * Aparna Mahadevan
+ * Ming-Hong Yang
+ * Eric Kuha
+ */
+
 #include <stdio.h>
 #include <sys/socket.h>
 #include <stdlib.h>

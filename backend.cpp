@@ -1,3 +1,11 @@
+/**
+ * backend.cpp
+ * Project 2 - Distributed bulletin Board
+ * Aparna Mahadevan
+ * Ming-Hong Yang
+ * Eric Kuha
+ */
+
 #include <string>
 #include <algorithm>
 #include <iostream>
