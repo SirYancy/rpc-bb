@@ -141,7 +141,7 @@ bool ConnectToServer(char *serverIP, int serverPort) {
 
     // Connect to server
     if(connect(gServerSocket, (struct sockaddr *)&server , sizeof(server)) < 0) {
-        printf("Connection failed\n");
+        printf("Connection failed %s\n", strerror(errno));
         return false;
     }
 
@@ -168,7 +168,7 @@ bool ConnectToCoordinator(char *serverIP, int serverPort, int localPort) {
 
     // Connect to coordinator
     if(connect(gCoordinatorSocket, (struct sockaddr *)&server , sizeof(server)) < 0) {
-        printf("Connection failed\n");
+        printf("Connection failed %s\n", strerror(errno));
         return false;
     }
 
@@ -239,7 +239,8 @@ void *client_handler(void *ptr) {
     char *consType = (char *)args->type;
 
     while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
-        buffer[recvSize] = '\0';
+	buffer[recvSize] = '\0';
+        message = NULL;
         printf("tcp Client hdl: %s\n", buffer);
         message = handle_request(buffer, CLIENT, consType);
         printf("Message: \n%s\n", message);
@@ -285,11 +286,12 @@ void *server_handler(void *ptr) {
     // Insert the socket mapping for this server
     gSocketMap.insert(std::pair<int, int>(socket, gServerSocket));
 
-    while((recvSize = recv(socket, buffer, MAX_LEN, 0)) > 0) {
+    while((recvSize = recv(socket, buffer, MAX_LEN,0)) > 0) {
         // Handle messages from servers
-        buffer[recvSize] = '\0';
+        buffer[MAX_LEN] = '\0';
         printf("tcp Server hdl: %s\n", buffer);
-        message = handle_request(buffer, SERVER, consType);
+        message = NULL;
+	message = handle_request(buffer, SERVER, consType);
         printf("Message: \n%s\n", message);
         if (message != NULL) {
             send(socket, message, strlen(message), 0);

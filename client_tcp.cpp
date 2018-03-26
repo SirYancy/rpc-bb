@@ -43,6 +43,7 @@ void *client_thread_func(void *args)
 
     while(live)
     {
+	memset(buffer, '\0', MAX_LEN);
         printf("Welcome, %s!\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
                 username,
                 "What do you want to do?",
@@ -53,6 +54,7 @@ void *client_thread_func(void *args)
                 "5 - Exit",
                 "> ");
         scanf("%d", &menu_choice);
+
         //flush input buffer
         int c;
         while ((c = getchar()) != '\n' && c != EOF) { }
@@ -86,7 +88,7 @@ void *client_thread_func(void *args)
                 sprintf(buffer, "article;%d", id);
                 SendThroughSocket(gServerSocket, buffer, strlen(buffer));
                 RecvFromSocket(gServerSocket, buffer);
-                printf("\n%s\n", buffer);
+                printf("Got Article:\n %s\n", buffer);
                 break;
             case 4:
                 printf("\nReplying to:\n");
@@ -100,7 +102,6 @@ void *client_thread_func(void *args)
                     username,
                     content);
                 SendThroughSocket(gServerSocket, buffer, strlen(buffer));
-                //RecvFromSocket(gServerSocket, buffer);
                 printf("%s\n", buffer);
                 break;
             case 5:
